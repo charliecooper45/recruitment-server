@@ -15,12 +15,12 @@ import database.beans.Candidate;
 public class ServerProxy extends UnicastRemoteObject implements ServerInterface {
 	private final ServerInterface theServer;
 	// The user associated with this proxy 
-	private String userID;
+	private String userId;
 	private String userType;
 
-	public ServerProxy(String userID, String userType, ServerInterface theServer) throws RemoteException, SecurityException {
+	public ServerProxy(String userId, String userType, ServerInterface theServer) throws RemoteException, SecurityException {
 		this.theServer = theServer;
-		this.userID = userID;
+		this.userId = userId;
 		this.userType = userType;
 	}
 
