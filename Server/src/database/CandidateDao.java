@@ -10,7 +10,7 @@ import java.util.List;
 import database.beans.Candidate;
 
 /**
- * Processes request for the candidate table in the recruitment database.
+ * Processes requests for the candidate table in the recruitment database.
  * @author Charlie
  */
 public class CandidateDao {

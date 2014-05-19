@@ -8,6 +8,8 @@ import java.util.List;
 
 import database.DaoFactory;
 import database.beans.Candidate;
+import database.beans.User;
+import database.beans.Vacancy;
 
 /**
  * Processes requests from the client. 
@@ -21,5 +23,10 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public List<Candidate> listCandidates() {
 		return DaoFactory.getCandidateDao().listCandidates();
+	}
+
+	@Override
+	public List<Vacancy> listVacancies(boolean open, User user) {
+		return DaoFactory.getVacancyDao().listVacancies(open, user);
 	}
 }

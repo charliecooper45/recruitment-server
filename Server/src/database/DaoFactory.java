@@ -12,4 +12,8 @@ public final class DaoFactory {
 	public static UserDao getUserDao() {
 		return new UserDao();
 	}
+	
+	public static VacancyDao getVacancyDao() {
+		return new VacancyDao();
+	}
 }

@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import security.BCrypt;
 
 /**
- * Processes request for the user table in the recruitment database.
+ * Processes requests for the user table in the recruitment database.
  * @author Charlie
  */
 public class UserDao {

@@ -7,6 +7,8 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
 import database.beans.Candidate;
+import database.beans.User;
+import database.beans.Vacancy;
 
 /**
  * Controls access to the server via the proxy pattern.
@@ -27,5 +29,10 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	@Override
 	public List<Candidate> listCandidates() throws RemoteException {
 		return theServer.listCandidates();
+	}
+
+	@Override
+	public List<Vacancy> listVacancies(boolean open, User user) throws RemoteException {
+		return theServer.listVacancies(open, user);
 	}
 }

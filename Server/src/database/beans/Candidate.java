@@ -3,7 +3,7 @@ package database.beans;
 import java.io.Serializable;
 
 /**
- * Bean that represents an instance of the entity Candidate on the recruitment database. 
+ * Bean that represents an instance of the entity Candidate in the recruitment database. 
  * @author Charlie
  */
 public class Candidate implements Serializable {
