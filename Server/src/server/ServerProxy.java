@@ -1,6 +1,7 @@
 package server;
 
 import interfaces.ServerInterface;
+import interfaces.UserType;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -9,6 +10,7 @@ import java.util.List;
 import database.beans.Candidate;
 import database.beans.User;
 import database.beans.Vacancy;
+
 
 /**
  * Controls access to the server via the proxy pattern.
@@ -37,7 +39,17 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	}
 
 	@Override
-	public List<User> getUsers(String userType, boolean status) throws RemoteException {
+	public List<User> getUsers(UserType userType, boolean status) throws RemoteException {
 		return theServer.getUsers(userType, status);
+	}
+
+	@Override
+	public UserType getUserType(String userId) throws RemoteException {
+		return theServer.getUserType(userId);
+	}
+
+	@Override
+	public Vacancy getVacancy(int vacancyId) throws RemoteException {
+		return theServer.getVacancy(vacancyId);
 	}
 }

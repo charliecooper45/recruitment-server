@@ -1,6 +1,7 @@
 package server;
 
 import interfaces.ServerInterface;
+import interfaces.UserType;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -29,9 +30,19 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public List<Vacancy> getVacancies(boolean open, User user) {
 		return DaoFactory.getVacancyDao().getVacancies(open, user);
 	}
+	
+	@Override
+	public Vacancy getVacancy(int vacancyId) throws RemoteException {
+		return DaoFactory.getVacancyDao().getVacancy(vacancyId);
+	}
 
 	@Override
-	public List<User> getUsers(String userType, boolean status) throws RemoteException {
+	public List<User> getUsers(UserType userType, boolean status) throws RemoteException {
 		return DaoFactory.getUserDao().getUsers(userType, status);
+	}
+
+	@Override
+	public UserType getUserType(String userId) throws RemoteException {
+		return DaoFactory.getUserDao().getUserType(userId);
 	}
 }

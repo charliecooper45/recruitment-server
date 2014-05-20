@@ -9,7 +9,7 @@ import java.util.List;
 
 import security.BCrypt;
 import database.beans.User;
-import database.beans.Vacancy;
+import interfaces.UserType;
 
 /**
  * Processes requests for the user table in the recruitment database.
@@ -70,25 +70,28 @@ public class UserDao {
 		}
 	}
 
-	public List<User> getUsers(String userType, boolean status) {
+	public List<User> getUsers(UserType userType, boolean status) {
 		PreparedStatement statement = null;
 		List<User> users = new ArrayList<User>();
+		String userTypeString;
 
 		if (userType == null) {
 			// get both types of user
-			userType = "%";
+			userTypeString = "%";
+		} else {
+			userTypeString = userType.toString();
 		}
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
-			if(status) {
+			if (status) {
 				// run this if only looking for active users
 				statement = conn.prepareStatement("SELECT user_id, first_name, surname FROM user WHERE account_type LIKE ? AND account_status LIKE ?");
-				statement.setString(1, userType);
+				statement.setString(1, userTypeString);
 				statement.setBoolean(2, status);
 			} else {
 				// run this if looking for active and closed users
 				statement = conn.prepareStatement("SELECT user_id, first_name, surname FROM user WHERE account_type LIKE ?");
-				statement.setString(1, userType);
+				statement.setString(1, userTypeString);
 			}
 
 			ResultSet rs = statement.executeQuery();
@@ -107,5 +110,26 @@ public class UserDao {
 		}
 
 		return users;
+	}
+
+	public UserType getUserType(String userId) {
+		PreparedStatement statement = null;
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("SELECT account_type FROM user WHERE user_id = ?");
+			statement.setString(1, userId);
+
+			ResultSet rs = statement.executeQuery();
+
+			if (rs.next()) {
+				String userType = rs.getString("account_type");
+				return UserType.valueOf(userType.toUpperCase());
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return null;
+		}
+		return null;
 	}
 }
