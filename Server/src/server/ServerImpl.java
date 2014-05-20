@@ -21,12 +21,17 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	}
 
 	@Override
-	public List<Candidate> listCandidates() {
-		return DaoFactory.getCandidateDao().listCandidates();
+	public List<Candidate> getCandidates() {
+		return DaoFactory.getCandidateDao().getCandidates();
 	}
 
 	@Override
-	public List<Vacancy> listVacancies(boolean open, User user) {
-		return DaoFactory.getVacancyDao().listVacancies(open, user);
+	public List<Vacancy> getVacancies(boolean open, User user) {
+		return DaoFactory.getVacancyDao().getVacancies(open, user);
+	}
+
+	@Override
+	public List<User> getUsers(String userType, boolean status) throws RemoteException {
+		return DaoFactory.getUserDao().getUsers(userType, status);
 	}
 }

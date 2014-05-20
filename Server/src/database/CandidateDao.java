@@ -14,7 +14,7 @@ import database.beans.Candidate;
  * @author Charlie
  */
 public class CandidateDao {
-	public List<Candidate> listCandidates() {	
+	public List<Candidate> getCandidates() {	
 		List<Candidate> candidates = new ArrayList<>();
 		int id = -1;
 		String firstName, surname, jobTitle, phoneNumber, emailAddress, address, notes, linkedInProfile, cv, userId;

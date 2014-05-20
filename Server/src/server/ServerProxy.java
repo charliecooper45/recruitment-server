@@ -27,12 +27,17 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	}
 
 	@Override
-	public List<Candidate> listCandidates() throws RemoteException {
-		return theServer.listCandidates();
+	public List<Candidate> getCandidates() throws RemoteException {
+		return theServer.getCandidates();
 	}
 
 	@Override
-	public List<Vacancy> listVacancies(boolean open, User user) throws RemoteException {
-		return theServer.listVacancies(open, user);
+	public List<Vacancy> getVacancies(boolean open, User user) throws RemoteException {
+		return theServer.getVacancies(open, user);
+	}
+
+	@Override
+	public List<User> getUsers(String userType, boolean status) throws RemoteException {
+		return theServer.getUsers(userType, status);
 	}
 }

@@ -16,7 +16,7 @@ import database.beans.Vacancy;
  * @author Charlie
  */
 public class VacancyDao {
-	public List<Vacancy> listVacancies(boolean open, User user) {
+	public List<Vacancy> getVacancies(boolean open, User user) {
 		PreparedStatement statement = null;
 		List<Vacancy> vacancies = new ArrayList<>();
 		int vacancyId = -1, organisationId = -1, contactId = -1;
@@ -55,7 +55,6 @@ public class VacancyDao {
 				profile = rs.getString("profile");
 				userId = rs.getString("user_user_id");
 				
-				//TODO NEXT: get the organisation and contact names to store in the bean
 				PreparedStatement orgStatement = conn.prepareStatement("SELECT organisation_name FROM organisation WHERE organisation_id = ?");
 				orgStatement.setInt(1, organisationId);
 				ResultSet orgRs = orgStatement.executeQuery();
