@@ -7,6 +7,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
+import com.healthmarketscience.rmiio.RemoteInputStream;
+
 import database.beans.Candidate;
 import database.beans.User;
 import database.beans.Vacancy;
@@ -51,5 +53,10 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	@Override
 	public Vacancy getVacancy(int vacancyId) throws RemoteException {
 		return theServer.getVacancy(vacancyId);
+	}
+
+	@Override
+	public RemoteInputStream getVacancyProfile(String fileName) throws RemoteException {
+		return theServer.getVacancyProfile(fileName);
 	}
 }

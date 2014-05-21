@@ -7,6 +7,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
+import com.healthmarketscience.rmiio.RemoteInputStream;
+
 import database.DaoFactory;
 import database.beans.Candidate;
 import database.beans.User;
@@ -44,5 +46,10 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public UserType getUserType(String userId) throws RemoteException {
 		return DaoFactory.getUserDao().getUserType(userId);
+	}
+
+	@Override
+	public RemoteInputStream getVacancyProfile(String fileName) {
+		return DaoFactory.getVacancyDao().getVacancyProfile(fileName);
 	}
 }

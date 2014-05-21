@@ -1,5 +1,11 @@
 package database;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +13,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import server.ServerMain;
+
+import com.healthmarketscience.rmiio.RemoteInputStream;
+import com.healthmarketscience.rmiio.RemoteInputStreamServer;
+import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 
 import database.beans.User;
 import database.beans.Vacancy;
@@ -135,5 +147,21 @@ public class VacancyDao {
 			return null;
 		}
 		return vacancy;
+	}
+
+	public RemoteInputStream getVacancyProfile(String fileName) {
+		String fileLocation = ServerMain.VACANCY_PROFILES_FOLDER + "/" + fileName;
+		Path path = Paths.get(fileLocation);
+		
+		InputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(path.toString());
+		} catch (FileNotFoundException e) {
+			// TODO handle this exception
+			e.printStackTrace();
+			return null;
+		}
+		RemoteInputStreamServer remoteFileData = new SimpleRemoteInputStream(inputStream); 
+		return remoteFileData;
 	}
 }
