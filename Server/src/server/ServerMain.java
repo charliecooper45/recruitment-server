@@ -3,11 +3,14 @@ package server;
 import interfaces.LoginInterface;
 import interfaces.ServerInterface;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.rmi.Naming;
 import java.util.Date;
 
@@ -43,12 +46,57 @@ public class ServerMain {
 		// checks if the server folder exists
 		Path serverFolderPath = Paths.get(SERVER_FOLDER);
 		if (!Files.exists(serverFolderPath)) {
-			
+
 			// create the main server directory
 			Files.createDirectory(serverFolderPath);
-			
+
 			// create the vacancy specs folder directory
 			Files.createDirectory(Paths.get(VACANCY_PROFILES_FOLDER));
-		} 
+		}
+	}
+
+	public static void storeFile(InputStream inStream, Path filePath) throws IOException {
+		// write the file to a location
+		BufferedInputStream bufferedInputStream = new BufferedInputStream(inStream);
+		FileOutputStream outputStream = null;
+		try {
+			outputStream = new FileOutputStream(filePath.toFile());
+			int size = 0;
+			byte[] byteBuff = new byte[1024];
+			while ((size = bufferedInputStream.read(byteBuff)) != -1) {
+				outputStream.write(byteBuff, 0, size);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			outputStream.close();
+			bufferedInputStream.close();
+		}
+	}
+
+	public static Path getCorrectFilePath(String path, String fileName) {
+		//Initially file trial.txt is there in the directory
+		Path filePath = Paths.get(path + "/" + fileName);
+		Path newFilePath = null;
+
+		if (Files.exists(filePath)) {
+			int i = 1;
+			
+			newFilePath = filePath;
+			// keep incrementing until an acceptable filename is found
+			while (true) {
+				if (Files.exists(newFilePath)) {
+					newFilePath = Paths.get(filePath.toUri());
+					int index = fileName.lastIndexOf("."); 
+					String newFileName = fileName.substring(0, index) + "(" + i + ")" + fileName.substring(index);
+					newFilePath = Paths.get(path + "/" + newFileName);
+					i++;
+				} else {
+					return newFilePath;
+				}
+			}
+		}
+		return filePath;
 	}
 }

@@ -52,4 +52,14 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public RemoteInputStream getVacancyProfile(String fileName) {
 		return DaoFactory.getVacancyDao().getVacancyProfile(fileName);
 	}
+
+	@Override
+	public boolean addVacancyProfile(Vacancy vacancy, RemoteInputStream profileData, String oldFileName) throws RemoteException {
+		return DaoFactory.getVacancyDao().addVacancyProfile(vacancy, profileData, oldFileName);
+	}
+
+	@Override
+	public boolean removeVacancyProfile(Vacancy vacancy) throws RemoteException {
+		return DaoFactory.getVacancyDao().removeVacancyProfile(vacancy);
+	}
 }

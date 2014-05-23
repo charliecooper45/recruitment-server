@@ -2,6 +2,7 @@ package database;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +18,7 @@ import java.util.List;
 import server.ServerMain;
 
 import com.healthmarketscience.rmiio.RemoteInputStream;
+import com.healthmarketscience.rmiio.RemoteInputStreamClient;
 import com.healthmarketscience.rmiio.RemoteInputStreamServer;
 import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 
@@ -163,5 +165,65 @@ public class VacancyDao {
 		}
 		RemoteInputStreamServer remoteFileData = new SimpleRemoteInputStream(inputStream); 
 		return remoteFileData;
+	}
+
+	public boolean addVacancyProfile(Vacancy vacancy, RemoteInputStream profileData, String oldFileName) {
+		PreparedStatement statement = null;
+		InputStream fileData;
+		
+		// add the profile to the folder
+		try {
+			//delete the old file if it exists
+			Path path = Paths.get(ServerMain.VACANCY_PROFILES_FOLDER + "/" + oldFileName);
+			if(Files.exists(path)) 
+				Files.delete(path);
+			
+			// add the new file
+			fileData = RemoteInputStreamClient.wrap(profileData);
+			path = ServerMain.getCorrectFilePath(ServerMain.VACANCY_PROFILES_FOLDER, vacancy.getProfile());
+			ServerMain.storeFile(fileData, path);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		// update the database
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE vacancy SET profile = ? WHERE vacancy_id = ?");
+			statement.setString(1, vacancy.getProfile());
+			statement.setInt(2, vacancy.getVacancyId());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	public boolean removeVacancyProfile(Vacancy vacancy) {
+		PreparedStatement statement = null;
+		
+		try {
+			//delete the file
+			Path path = Paths.get(ServerMain.VACANCY_PROFILES_FOLDER + "/" + vacancy.getProfile());
+			Files.delete(path);
+		} catch (IOException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+		
+		// update the database
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE vacancy SET profile = null WHERE vacancy_id = ?");
+			statement.setInt(1, vacancy.getVacancyId());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 }

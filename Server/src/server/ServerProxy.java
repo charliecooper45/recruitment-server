@@ -59,4 +59,14 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public RemoteInputStream getVacancyProfile(String fileName) throws RemoteException {
 		return theServer.getVacancyProfile(fileName);
 	}
+
+	@Override
+	public boolean addVacancyProfile(Vacancy vacancy, RemoteInputStream profileData, String oldFileName) throws RemoteException {
+		return theServer.addVacancyProfile(vacancy, profileData, oldFileName);
+	}
+
+	@Override
+	public boolean removeVacancyProfile(Vacancy vacancy) throws RemoteException {
+		return theServer.removeVacancyProfile(vacancy);
+	}
 }
