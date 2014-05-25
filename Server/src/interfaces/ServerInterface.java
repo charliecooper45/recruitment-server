@@ -7,6 +7,7 @@ import java.util.List;
 import com.healthmarketscience.rmiio.RemoteInputStream;
 
 import database.beans.Candidate;
+import database.beans.Organisation;
 import database.beans.User;
 import database.beans.Vacancy;
 
@@ -24,4 +25,6 @@ public interface ServerInterface extends Remote{
 	public RemoteInputStream getVacancyProfile(String fileName) throws RemoteException;
 	public boolean addVacancyProfile(Vacancy vacancy, RemoteInputStream profileData, String oldFileName) throws RemoteException;
 	public boolean removeVacancyProfile(Vacancy vacancy) throws RemoteException;
+	public boolean changeVacancyStatus(Vacancy vacancy) throws RemoteException;
+	public List<Organisation> getOrganisations() throws RemoteException;
 }

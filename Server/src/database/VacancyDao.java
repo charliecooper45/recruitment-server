@@ -226,4 +226,21 @@ public class VacancyDao {
 		}
 		return true;
 	}
+
+	public boolean changeVacancyStatus(Vacancy vacancy) {
+		PreparedStatement statement = null;
+		
+		// update the database
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE vacancy SET vacancy_status = ? WHERE vacancy_id = ?");
+			statement.setBoolean(1, vacancy.getStatus());
+			statement.setInt(2, vacancy.getVacancyId());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
 }

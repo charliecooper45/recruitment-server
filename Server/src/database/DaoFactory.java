@@ -1,5 +1,6 @@
 package database;
 
+
 /**
  * Returns all DAO instances.
  * @author Charlie
@@ -15,5 +16,9 @@ public final class DaoFactory {
 	
 	public static VacancyDao getVacancyDao() {
 		return new VacancyDao();
+	}
+
+	public static OrganisationDao getOrganisationDao() {
+		return new OrganisationDao();
 	}
 }

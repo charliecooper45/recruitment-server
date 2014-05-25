@@ -10,6 +10,7 @@ import java.util.List;
 import com.healthmarketscience.rmiio.RemoteInputStream;
 
 import database.beans.Candidate;
+import database.beans.Organisation;
 import database.beans.User;
 import database.beans.Vacancy;
 
@@ -68,5 +69,15 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	@Override
 	public boolean removeVacancyProfile(Vacancy vacancy) throws RemoteException {
 		return theServer.removeVacancyProfile(vacancy);
+	}
+
+	@Override
+	public boolean changeVacancyStatus(Vacancy vacancy) throws RemoteException {
+		return theServer.changeVacancyStatus(vacancy);
+	}
+
+	@Override
+	public List<Organisation> getOrganisations() throws RemoteException {
+		return theServer.getOrganisations();
 	}
 }
