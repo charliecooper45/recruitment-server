@@ -11,6 +11,7 @@ import com.healthmarketscience.rmiio.RemoteInputStream;
 
 import database.DaoFactory;
 import database.beans.Candidate;
+import database.beans.Contact;
 import database.beans.Organisation;
 import database.beans.User;
 import database.beans.Vacancy;
@@ -72,5 +73,10 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public List<Organisation> getOrganisations() throws RemoteException {
 		return DaoFactory.getOrganisationDao().getOrganisations();
+	}
+
+	@Override
+	public List<Contact> getOrganisationsContacts(Organisation organisation) throws RemoteException {
+		return DaoFactory.getContactDao().getOrganisationsContacts(organisation);
 	}
 }

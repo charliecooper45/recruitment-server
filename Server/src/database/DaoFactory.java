@@ -1,5 +1,7 @@
 package database;
 
+import interfaces.ServerInterface;
+
 
 /**
  * Returns all DAO instances.
@@ -20,5 +22,9 @@ public final class DaoFactory {
 
 	public static OrganisationDao getOrganisationDao() {
 		return new OrganisationDao();
+	}
+
+	public static ContactDao getContactDao() {
+		return new ContactDao();
 	}
 }
