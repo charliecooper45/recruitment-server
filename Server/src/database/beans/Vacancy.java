@@ -22,6 +22,20 @@ public class Vacancy implements Serializable {
 	private String contactName;
 	private String contactPhoneNumber;
 	
+	public Vacancy(boolean status, String name, Date vacancyDate, String text, String profile, int organisationId, String organisationName, int contactId, String contactName, String contactPhoneNumber) {
+		super();
+		this.status = status;
+		this.name = name;
+		this.vacancyDate = vacancyDate;
+		this.text = text;
+		this.profile = profile;
+		this.organisationId = organisationId;
+		this.organisationName = organisationName;
+		this.contactId = contactId;
+		this.contactName = contactName;
+		this.contactPhoneNumber = contactPhoneNumber;
+	}
+
 	public Vacancy(int vacancyId, boolean status, String name, Date vacancyDate, String text, String profile, int organisationId, String organisationName, String userId, int contactId, String contactName, String contactPhoneNumber) {
 		this.vacancyId = vacancyId;
 		this.status = status;
@@ -78,6 +92,18 @@ public class Vacancy implements Serializable {
 		return profile;
 	}
 	
+	public String getText() {
+		return text;
+	}
+	
+	public int getOrganisationId() {
+		return organisationId;
+	}
+	
+	public int getContactId() {
+		return contactId;
+	}
+
 	public void setProfile(String profile) {
 		this.profile = profile;
 	}

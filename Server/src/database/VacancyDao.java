@@ -106,8 +106,7 @@ public class VacancyDao {
 		String name = null, text = null, profile = null, userId = null, organisationName = null, contactName = null, contactPhoneNumber = null;
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
-			statement = conn.prepareStatement("SELECT vacancy_id, vacancy_status, name, vacancy_date, notes, profile, organisation_organisation_id, user_user_id, " 
-					+ "contact_contact_id FROM vacancy WHERE vacancy_id LIKE ?");
+			statement = conn.prepareStatement("SELECT vacancy_id, vacancy_status, name, vacancy_date, notes, profile, organisation_organisation_id, user_user_id, " + "contact_contact_id FROM vacancy WHERE vacancy_id LIKE ?");
 			statement.setInt(1, vacancyId);
 
 			ResultSet rs = statement.executeQuery();
@@ -154,7 +153,7 @@ public class VacancyDao {
 	public RemoteInputStream getVacancyProfile(String fileName) {
 		String fileLocation = ServerMain.VACANCY_PROFILES_FOLDER + "/" + fileName;
 		Path path = Paths.get(fileLocation);
-		
+
 		InputStream inputStream = null;
 		try {
 			inputStream = new FileInputStream(path.toString());
@@ -163,21 +162,21 @@ public class VacancyDao {
 			e.printStackTrace();
 			return null;
 		}
-		RemoteInputStreamServer remoteFileData = new SimpleRemoteInputStream(inputStream); 
+		RemoteInputStreamServer remoteFileData = new SimpleRemoteInputStream(inputStream);
 		return remoteFileData;
 	}
 
 	public boolean addVacancyProfile(Vacancy vacancy, RemoteInputStream profileData, String oldFileName) {
 		PreparedStatement statement = null;
 		InputStream fileData;
-		
+
 		// add the profile to the folder
 		try {
 			//delete the old file if it exists
 			Path path = Paths.get(ServerMain.VACANCY_PROFILES_FOLDER + "/" + oldFileName);
-			if(Files.exists(path)) 
+			if (Files.exists(path))
 				Files.delete(path);
-			
+
 			// add the new file
 			fileData = RemoteInputStreamClient.wrap(profileData);
 			path = ServerMain.getCorrectFilePath(ServerMain.VACANCY_PROFILES_FOLDER, vacancy.getProfile());
@@ -186,7 +185,7 @@ public class VacancyDao {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		// update the database
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("UPDATE vacancy SET profile = ? WHERE vacancy_id = ?");
@@ -203,7 +202,7 @@ public class VacancyDao {
 
 	public boolean removeVacancyProfile(Vacancy vacancy) {
 		PreparedStatement statement = null;
-		
+
 		try {
 			//delete the file
 			Path path = Paths.get(ServerMain.VACANCY_PROFILES_FOLDER + "/" + vacancy.getProfile());
@@ -213,7 +212,7 @@ public class VacancyDao {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		// update the database
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("UPDATE vacancy SET profile = null WHERE vacancy_id = ?");
@@ -229,7 +228,7 @@ public class VacancyDao {
 
 	public boolean changeVacancyStatus(Vacancy vacancy) {
 		PreparedStatement statement = null;
-		
+
 		// update the database
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("UPDATE vacancy SET vacancy_status = ? WHERE vacancy_id = ?");
@@ -241,6 +240,45 @@ public class VacancyDao {
 			e.printStackTrace();
 			return false;
 		}
+		return true;
+	}
+
+	public boolean addVacancy(Vacancy vacancy, RemoteInputStream profileData) {
+		PreparedStatement statement = null;
+		InputStream fileData;
+		Path path = null;
+
+		if (profileData != null) {
+			try {
+				// add the new file if it has been specified
+				fileData = RemoteInputStreamClient.wrap(profileData);
+				path = ServerMain.getCorrectFilePath(ServerMain.VACANCY_PROFILES_FOLDER, vacancy.getProfile());
+				ServerMain.storeFile(fileData, path);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
+		}
+
+		// add the vacancy
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("INSERT INTO vacancy (vacancy_status, name, vacancy_date, notes, profile, organisation_organisation_id, user_user_id, contact_contact_id) " + "VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+			statement.setBoolean(1, vacancy.getStatus());
+			statement.setString(2, vacancy.getName());
+			statement.setObject(3, vacancy.getVacancyDate());
+			statement.setString(4, vacancy.getText());
+			statement.setString(5, vacancy.getProfile());
+			statement.setInt(6, vacancy.getOrganisationId());
+			statement.setString(7, vacancy.getUserId());
+			statement.setInt(8, vacancy.getContactId());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+
 		return true;
 	}
 }

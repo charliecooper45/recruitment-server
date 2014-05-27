@@ -76,14 +76,13 @@ public class ServerMain {
 	}
 
 	public static Path getCorrectFilePath(String path, String fileName) {
-		//Initially file trial.txt is there in the directory
 		Path filePath = Paths.get(path + "/" + fileName);
 		Path newFilePath = null;
 
 		if (Files.exists(filePath)) {
 			int i = 1;
-			
 			newFilePath = filePath;
+			
 			// keep incrementing until an acceptable filename is found
 			while (true) {
 				if (Files.exists(newFilePath)) {

@@ -86,4 +86,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public List<Contact> getOrganisationsContacts(Organisation organisation) throws RemoteException {
 		return theServer.getOrganisationsContacts(organisation);
 	}
+
+	@Override
+	public boolean addVacancy(Vacancy vacancy, RemoteInputStream profileData) throws RemoteException {
+		return theServer.addVacancy(vacancy, profileData);
+	}
 }

@@ -79,4 +79,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public List<Contact> getOrganisationsContacts(Organisation organisation) throws RemoteException {
 		return DaoFactory.getContactDao().getOrganisationsContacts(organisation);
 	}
+
+	@Override
+	public boolean addVacancy(Vacancy vacancy, RemoteInputStream profileData) throws RemoteException {
+		return DaoFactory.getVacancyDao().addVacancy(vacancy, profileData);
+	}
 }
