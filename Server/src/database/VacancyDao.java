@@ -281,4 +281,24 @@ public class VacancyDao {
 
 		return true;
 	}
+
+	public boolean removeVacancy(Vacancy vacancy) {
+		PreparedStatement statement = null;
+		int returned = 0;
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("DELETE FROM vacancy WHERE vacancy_id = ?");
+			statement.setInt(1, vacancy.getVacancyId());
+			returned = statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+		if(returned != 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

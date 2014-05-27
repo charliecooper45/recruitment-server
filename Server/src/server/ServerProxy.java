@@ -91,4 +91,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public boolean addVacancy(Vacancy vacancy, RemoteInputStream profileData) throws RemoteException {
 		return theServer.addVacancy(vacancy, profileData);
 	}
+
+	@Override
+	public boolean removeVacancy(Vacancy vacancy) throws RemoteException {
+		return theServer.removeVacancy(vacancy);
+	}
 }
