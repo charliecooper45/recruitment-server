@@ -96,4 +96,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public boolean removeVacancy(Vacancy vacancy) throws RemoteException {
 		return theServer.removeVacancy(vacancy);
 	}
+
+	@Override
+	public Organisation getOrganisation(int organisationId) throws RemoteException {
+		return theServer.getOrganisation(organisationId);
+	}
 }
