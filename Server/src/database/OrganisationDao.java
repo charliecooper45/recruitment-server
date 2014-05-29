@@ -1,5 +1,12 @@
 package database;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +14,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import server.ServerMain;
+
+import com.healthmarketscience.rmiio.RemoteInputStream;
+import com.healthmarketscience.rmiio.RemoteInputStreamClient;
+import com.healthmarketscience.rmiio.RemoteInputStreamServer;
+import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 
 import database.beans.Organisation;
 
@@ -83,5 +97,57 @@ public class OrganisationDao {
 			return null;
 		}
 		return organisation;
+	}
+
+	public RemoteInputStream getOrganisationTob(String fileName) {
+		String fileLocation = ServerMain.ORGANISATION_TOB_FOLDER + "/" + fileName;
+		Path path = Paths.get(fileLocation);
+
+		InputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(path.toString());
+		} catch (FileNotFoundException e) {
+			// TODO handle this exception
+			e.printStackTrace();
+			return null;
+		}
+		RemoteInputStreamServer remoteFileData = new SimpleRemoteInputStream(inputStream);
+		return remoteFileData;
+	}
+
+	public boolean addOrganisationTob(Organisation organisation, RemoteInputStream tobData, String oldFileName) {
+		PreparedStatement statement = null;
+		InputStream fileData;
+
+		// add the profile to the folder
+		try {
+			//delete the old file if it exists
+			Path path = Paths.get(ServerMain.ORGANISATION_TOB_FOLDER + "/" + oldFileName);
+			if (Files.exists(path))
+				Files.delete(path);
+
+			// add the new file
+			fileData = RemoteInputStreamClient.wrap(tobData);
+			path = ServerMain.getCorrectFilePath(ServerMain.ORGANISATION_TOB_FOLDER, organisation.getTermsOfBusiness());
+			organisation.setTermsOfBusiness(path.getFileName().toString());
+			System.err.println("Path of organisation tob: " + path);
+			ServerMain.storeFile(fileData, path);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		// update the database
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE organisation SET terms_of_business = ? WHERE organisation_id = ?");
+			statement.setString(1, organisation.getTermsOfBusiness());
+			statement.setInt(2, organisation.getOrganisationId());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 }

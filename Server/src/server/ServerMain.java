@@ -4,7 +4,6 @@ import interfaces.LoginInterface;
 import interfaces.ServerInterface;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,10 +20,12 @@ import java.util.Date;
 public class ServerMain {
 	private final static String SERVER_FOLDER;
 	public final static String VACANCY_PROFILES_FOLDER;
+	public final static String ORGANISATION_TOB_FOLDER;
 
 	static {
 		SERVER_FOLDER = "C:/Users/Charlie/Documents/My Dropbox/Open University/TM470 - The computing and IT project/6. Coding/Test Server/Server";
 		VACANCY_PROFILES_FOLDER = SERVER_FOLDER + "/Vacancy Profiles";
+		ORGANISATION_TOB_FOLDER = SERVER_FOLDER + "/Organisation Terms of business";
 	}
 
 	public static void main(String[] args) {
@@ -52,6 +53,9 @@ public class ServerMain {
 
 			// create the vacancy specs folder directory
 			Files.createDirectory(Paths.get(VACANCY_PROFILES_FOLDER));
+			
+			// create the organisation TOBs directory
+			Files.createDirectory(Paths.get(ORGANISATION_TOB_FOLDER));
 		}
 	}
 

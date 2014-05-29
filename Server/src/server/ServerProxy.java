@@ -101,4 +101,14 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public Organisation getOrganisation(int organisationId) throws RemoteException {
 		return theServer.getOrganisation(organisationId);
 	}
+
+	@Override
+	public RemoteInputStream getOrganisationTob(String fileName) throws RemoteException {
+		return theServer.getOrganisationTob(fileName);
+	}
+
+	@Override
+	public boolean addOrganisationTob(Organisation organisation, RemoteInputStream tobData, String oldFileName) throws RemoteException {
+		return theServer.addOrganisationTob(organisation, tobData, oldFileName);
+	}
 }

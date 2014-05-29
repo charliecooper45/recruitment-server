@@ -68,6 +68,14 @@ public class Organisation implements Serializable, Comparable<Organisation>{
 		return website;
 	}
 	
+	public String getTermsOfBusiness() {
+		return termsOfBusiness;
+	}
+	
+	public void setTermsOfBusiness(String termsOfBusiness) {
+		this.termsOfBusiness = termsOfBusiness;
+	}
+	
 	@Override
 	public String toString() {
 		return organisationName;
