@@ -104,4 +104,14 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public boolean addOrganisationTob(Organisation organisation, RemoteInputStream tobData, String oldFileName) throws RemoteException {
 		return DaoFactory.getOrganisationDao().addOrganisationTob(organisation, tobData, oldFileName);
 	}
+
+	@Override
+	public boolean removeOrganisationTob(Organisation organisation) throws RemoteException {
+		return DaoFactory.getOrganisationDao().removeOrganisationTob(organisation);
+	}
+
+	@Override
+	public boolean addOrganisation(Organisation organisation, RemoteInputStream tobData) throws RemoteException {
+		return DaoFactory.getOrganisationDao().addOrganisation(organisation, tobData);
+	}
 }
