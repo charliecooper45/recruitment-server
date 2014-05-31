@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -214,5 +213,25 @@ public class OrganisationDao {
 		}
 
 		return true;
+	}
+	
+	public boolean removeOrganisation(Organisation organisation) {
+		PreparedStatement statement = null;
+		int returned = 0;
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("DELETE FROM organisation WHERE organisation_id = ?");
+			statement.setInt(1, organisation.getId());
+			returned = statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+		if(returned != 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

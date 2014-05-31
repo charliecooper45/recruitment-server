@@ -121,4 +121,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public boolean addOrganisation(Organisation organisation, RemoteInputStream tobData) throws RemoteException {
 		return theServer.addOrganisation(organisation, tobData);
 	}
+
+	@Override
+	public boolean removeOrganisation(Organisation organisation) throws RemoteException {
+		return theServer.removeOrganisation(organisation);
+	}
 }
