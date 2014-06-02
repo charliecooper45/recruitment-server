@@ -217,6 +217,19 @@ public class OrganisationDao {
 	public boolean removeOrganisation(Organisation organisation) {
 		PreparedStatement statement = null;
 		int returned = 0;
+		
+		// remove the TOB if they are present
+		if(organisation.getTermsOfBusiness() != null) {
+			try {
+				//delete the file
+				Path path = Paths.get(ServerMain.ORGANISATION_TOB_FOLDER + "/" + organisation.getTermsOfBusiness());
+				Files.delete(path);
+			} catch (IOException e) {
+				//TODO NEXT: revert here
+				e.printStackTrace();
+				return false;
+			}
+		}
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("DELETE FROM organisation WHERE organisation_id = ?");

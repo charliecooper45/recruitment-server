@@ -124,4 +124,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public boolean addCandidate(Candidate candidate, RemoteInputStream cvData) throws RemoteException {
 		return DaoFactory.getCandidateDao().addCandidate(candidate, cvData);
 	}
+
+	@Override
+	public boolean removeCandidate(Candidate candidate) throws RemoteException {
+		return DaoFactory.getCandidateDao().removeCandidate(candidate);
+	}
 }

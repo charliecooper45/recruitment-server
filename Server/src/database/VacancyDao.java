@@ -287,6 +287,19 @@ public class VacancyDao {
 	public boolean removeVacancy(Vacancy vacancy) {
 		PreparedStatement statement = null;
 		int returned = 0;
+		
+		// remove the vacancy profile if it is present
+		if(vacancy.getProfile() != null) {
+			try {
+				//delete the file
+				Path path = Paths.get(ServerMain.VACANCY_PROFILES_FOLDER + "/" + vacancy.getProfile());
+				Files.delete(path);
+			} catch (IOException e) {
+				//TODO NEXT: revert here
+				e.printStackTrace();
+				return false;
+			}
+		}
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("DELETE FROM vacancy WHERE vacancy_id = ?");

@@ -83,6 +83,6 @@ public class Candidate implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Candidate [id=" + id + ", firstName=" + firstName + ", surname=" + surname + ", jobTitle=" + jobTitle + ", phoneNumber=" + phoneNumber + ", emailAddress=" + emailAddress + ", address=" + address + ", notes=" + notes + ", linkedInProfile=" + linkedInProfile + ", CV=" + CV + ", userId=" + userId + "]";
+		return id + ": " + firstName + " " + surname;
 	}
 }

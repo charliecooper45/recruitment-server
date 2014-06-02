@@ -131,4 +131,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public boolean addCandidate(Candidate candidate, RemoteInputStream cvData) throws RemoteException {
 		return theServer.addCandidate(candidate, cvData);
 	}
+
+	@Override
+	public boolean removeCandidate(Candidate candidate) throws RemoteException {
+		return theServer.removeCandidate(candidate);
+	}
 }

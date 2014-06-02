@@ -2,7 +2,9 @@ package database;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,7 +44,7 @@ public class CandidateDao {
 				address = rs.getString("address");
 				notes = rs.getString("notes");
 				linkedInProfile = rs.getString("linkedin_profile");
-				cv = rs.getString("address");
+				cv = rs.getString("cv");
 				userId = rs.getString("user_user_id");
 				
 				candidates.add(new Candidate(id, firstName, surname, jobTitle, phoneNumber, emailAddress, address, notes, linkedInProfile, cv, userId));
@@ -96,5 +98,39 @@ public class CandidateDao {
 		}
 
 		return true;
+	}
+
+	
+	public boolean removeCandidate(Candidate candidate) {
+		PreparedStatement statement = null;
+		int returned = 0;
+		
+		// remove the candidate CV if it is present
+		if(candidate.getCV() != null) {
+			try {
+				//delete the file
+				Path path = Paths.get(ServerMain.CANDIDATE_CV_FOLDER + "/" + candidate.getCV());
+				Files.delete(path);
+			} catch (IOException e) {
+				//TODO NEXT: revert here
+				e.printStackTrace();
+				return false;
+			}
+		}
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("DELETE FROM candidate WHERE candidate_id = ?");
+			statement.setInt(1, candidate.getId());
+			returned = statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+		if(returned != 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
