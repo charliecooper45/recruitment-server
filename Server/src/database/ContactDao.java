@@ -42,4 +42,51 @@ public class ContactDao {
 		}
 		return contacts;
 	}
+
+	public boolean addContact(Contact contact) {
+		PreparedStatement statement = null;
+
+		// add the contact
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("INSERT INTO contact (first_name, surname, job_title, phone_number, email_address, address, notes, organisation_organisation_id" +
+					", user_user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			statement.setString(1, contact.getFirstName());
+			statement.setString(2, contact.getSurname());
+			statement.setString(3, contact.getJobTitle());
+			statement.setString(4, contact.getPhoneNumber());
+			statement.setString(5, contact.getEmailAddress());
+			statement.setString(6, contact.getAddress());
+			statement.setString(7, contact.getNotes());
+			statement.setInt(8, contact.getOrganisationId());
+			statement.setString(9, contact.getUserId());
+			
+			int value = statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean removeContact(Contact contact) {
+		PreparedStatement statement = null;
+		int returned = 0;
+		
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("DELETE FROM contact WHERE contact_id = ?");
+			statement.setInt(1, contact.getId());
+			returned = statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+		if(returned != 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

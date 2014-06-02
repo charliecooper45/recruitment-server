@@ -99,7 +99,6 @@ public class CandidateDao {
 
 		return true;
 	}
-
 	
 	public boolean removeCandidate(Candidate candidate) {
 		PreparedStatement statement = null;
