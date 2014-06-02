@@ -253,6 +253,7 @@ public class VacancyDao {
 				// add the new file if it has been specified
 				fileData = RemoteInputStreamClient.wrap(profileData);
 				path = ServerMain.getCorrectFilePath(ServerMain.VACANCY_PROFILES_FOLDER, vacancy.getProfile());
+				vacancy.setProfile(path.getFileName().toString());
 				ServerMain.storeFile(fileData, path);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -272,6 +273,7 @@ public class VacancyDao {
 			statement.setInt(6, vacancy.getOrganisationId());
 			statement.setString(7, vacancy.getUserId());
 			statement.setInt(8, vacancy.getContactId());
+			//TODO NEXT: use the int return value
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			//TODO NEXT: revert here

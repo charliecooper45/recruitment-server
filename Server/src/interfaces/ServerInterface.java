@@ -37,4 +37,5 @@ public interface ServerInterface extends Remote{
 	public boolean removeOrganisationTob(Organisation organisation) throws RemoteException;
 	public boolean addOrganisation(Organisation organisation, RemoteInputStream tobData) throws RemoteException;
 	public boolean removeOrganisation(Organisation organisation) throws RemoteException;
+	public boolean addCandidate(Candidate candidate, RemoteInputStream cvData) throws RemoteException;
 }

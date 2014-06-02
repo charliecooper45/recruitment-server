@@ -21,11 +21,13 @@ public class ServerMain {
 	private final static String SERVER_FOLDER;
 	public final static String VACANCY_PROFILES_FOLDER;
 	public final static String ORGANISATION_TOB_FOLDER;
+	public final static String CANDIDATE_CV_FOLDER;
 
 	static {
 		SERVER_FOLDER = "C:/Users/Charlie/Documents/My Dropbox/Open University/TM470 - The computing and IT project/6. Coding/Test Server/Server";
 		VACANCY_PROFILES_FOLDER = SERVER_FOLDER + "/Vacancy Profiles";
 		ORGANISATION_TOB_FOLDER = SERVER_FOLDER + "/Organisation Terms of business";
+		CANDIDATE_CV_FOLDER = SERVER_FOLDER + "/Candidate CVs";
 	}
 
 	public static void main(String[] args) {

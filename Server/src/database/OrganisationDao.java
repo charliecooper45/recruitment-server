@@ -128,7 +128,6 @@ public class OrganisationDao {
 			fileData = RemoteInputStreamClient.wrap(tobData);
 			path = ServerMain.getCorrectFilePath(ServerMain.ORGANISATION_TOB_FOLDER, organisation.getTermsOfBusiness());
 			organisation.setTermsOfBusiness(path.getFileName().toString());
-			System.err.println("Path of organisation tob: " + path);
 			ServerMain.storeFile(fileData, path);
 		} catch (IOException e) {
 			e.printStackTrace();
