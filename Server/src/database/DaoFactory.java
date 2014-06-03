@@ -27,4 +27,8 @@ public final class DaoFactory {
 	public static ContactDao getContactDao() {
 		return new ContactDao();
 	}
+
+	public static SkillDao getSkillDao() {
+		return new SkillDao();
+	}
 }

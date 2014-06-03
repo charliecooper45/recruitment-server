@@ -12,6 +12,7 @@ import com.healthmarketscience.rmiio.RemoteInputStream;
 import database.beans.Candidate;
 import database.beans.Contact;
 import database.beans.Organisation;
+import database.beans.Skill;
 import database.beans.User;
 import database.beans.Vacancy;
 
@@ -145,5 +146,10 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	@Override
 	public boolean removeContact(Contact contact) throws RemoteException {
 		return theServer.removeContact(contact);
+	}
+
+	@Override
+	public List<Skill> getSkills() throws RemoteException {
+		return theServer.getSkills();
 	}
 }
