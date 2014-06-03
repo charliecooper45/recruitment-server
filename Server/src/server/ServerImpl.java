@@ -13,6 +13,7 @@ import database.DaoFactory;
 import database.beans.Candidate;
 import database.beans.Contact;
 import database.beans.Organisation;
+import database.beans.Search;
 import database.beans.Skill;
 import database.beans.User;
 import database.beans.Vacancy;
@@ -144,5 +145,10 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public List<Skill> getSkills() throws RemoteException {
 		return DaoFactory.getSkillDao().getSkills();
+	}
+
+	@Override
+	public List<Candidate> searchCandidates(Search search) throws RemoteException {
+		return DaoFactory.getCandidateDao().searchCandidates(search);
 	}
 }
