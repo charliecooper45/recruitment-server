@@ -1,5 +1,7 @@
 package database;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -17,8 +19,11 @@ import server.ServerMain;
 
 import com.healthmarketscience.rmiio.RemoteInputStream;
 import com.healthmarketscience.rmiio.RemoteInputStreamClient;
+import com.healthmarketscience.rmiio.RemoteInputStreamServer;
+import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 
 import database.beans.Candidate;
+import database.beans.Organisation;
 import database.beans.Search;
 import database.beans.Skill;
 
@@ -230,5 +235,57 @@ public class CandidateDao {
 		}
 
 		return candidates;
+	}
+
+	
+	public Candidate getCandidate(int candidateId) {
+		PreparedStatement statement;
+		Candidate candidate = null;
+		String firstName = null, surname = null, jobTitle = null, phoneNumber = null, emailAddress = null, address = null, notes = null, linkedInProfile = null, cv = null, userId = null;
+		int id = -1;
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("SELECT candidate_id, first_name, surname, job_title, phone_number, email_address, address, notes, linkedin_profile, " +
+					"cv, user_user_id FROM candidate WHERE candidate_id = ?");
+			statement.setInt(1, candidateId);
+
+			ResultSet rs = statement.executeQuery();
+			if (rs.next()) {
+				id = rs.getInt("candidate_id");
+				firstName = rs.getString("first_name");
+				surname = rs.getString("surname");
+				jobTitle = rs.getString("job_title");
+				phoneNumber = rs.getString("phone_number");
+				emailAddress = rs.getString("email_address");
+				address = rs.getString("address");
+				notes = rs.getString("notes");
+				linkedInProfile = rs.getString("linkedin_profile");
+				cv = rs.getString("cv");
+				userId = rs.getString("user_user_id");
+			}
+			candidate = new Candidate(id, firstName, surname, jobTitle, phoneNumber, emailAddress, address, notes, linkedInProfile, cv, userId);
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return null;
+		}
+		return candidate;
+	}
+
+
+	public RemoteInputStream getCandidateCV(String fileName) {
+		String fileLocation = ServerMain.CANDIDATE_CV_FOLDER + "/" + fileName;
+		Path path = Paths.get(fileLocation);
+
+		InputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(path.toString());
+		} catch (FileNotFoundException e) {
+			// TODO handle this exception
+			e.printStackTrace();
+			return null;
+		}
+		RemoteInputStreamServer remoteFileData = new SimpleRemoteInputStream(inputStream);
+		return remoteFileData;
 	}
 }

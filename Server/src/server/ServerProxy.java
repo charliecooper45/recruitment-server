@@ -158,4 +158,14 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public List<Candidate> searchCandidates(Search search) throws RemoteException {
 		return theServer.searchCandidates(search);
 	}
+
+	@Override
+	public Candidate getCandidate(int candidateId) throws RemoteException {
+		return theServer.getCandidate(candidateId);
+	}
+
+	@Override
+	public RemoteInputStream getCandidateCV(String fileName) throws RemoteException {
+		return theServer.getCandidateCV(fileName);
+	}
 }
