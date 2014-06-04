@@ -172,20 +172,17 @@ public class CandidateDao {
 		}
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
-			if (skills.isEmpty()) {
-				// these queries are run if there are no skills to search for
-				if (searchJobTitle == null) {
-					statement = conn.prepareStatement("SELECT candidate_id, first_name, surname, job_title, phone_number, email_address, address, notes, linkedin_profile, cv, " + "user_user_id FROM candidate WHERE (first_name REGEXP ? OR surname REGEXP ?)");
-					statement.setString(1, searchFirstName + "+");
-					statement.setString(2, searchSurname + "+");
-				} else {
-					statement = conn.prepareStatement("SELECT candidate_id, first_name, surname, job_title, phone_number, email_address, address, notes, linkedin_profile, cv, " + "user_user_id FROM candidate WHERE (first_name REGEXP ? OR surname REGEXP ?) AND (job_title REGEXP ?)");
-					statement.setString(1, searchFirstName + "+");
-					statement.setString(2, searchSurname + "+");
-					statement.setString(3, searchJobTitle + "+");
-				}
+
+			// these queries are run if there are no skills to search for
+			if (searchJobTitle == null) {
+				statement = conn.prepareStatement("SELECT candidate_id, first_name, surname, job_title, phone_number, email_address, address, notes, linkedin_profile, cv, " + "user_user_id FROM candidate WHERE (first_name REGEXP ? OR surname REGEXP ?)");
+				statement.setString(1, searchFirstName + "+");
+				statement.setString(2, searchSurname + "+");
 			} else {
-				//TODO NEXT: build queries for when the search includes skills for the candidates
+				statement = conn.prepareStatement("SELECT candidate_id, first_name, surname, job_title, phone_number, email_address, address, notes, linkedin_profile, cv, " + "user_user_id FROM candidate WHERE (first_name REGEXP ? OR surname REGEXP ?) AND (job_title REGEXP ?)");
+				statement.setString(1, searchFirstName + "+");
+				statement.setString(2, searchSurname + "+");
+				statement.setString(3, searchJobTitle + "+");
 			}
 
 			ResultSet rs = statement.executeQuery();
@@ -201,8 +198,29 @@ public class CandidateDao {
 				linkedInProfile = rs.getString("linkedin_profile");
 				cv = rs.getString("cv");
 				userId = rs.getString("user_user_id");
+				
+				Candidate candidate = new Candidate(id, firstName, surname, jobTitle, phoneNumber, emailAddress, address, notes, linkedInProfile, cv, userId);
 
-				candidates.add(new Candidate(id, firstName, surname, jobTitle, phoneNumber, emailAddress, address, notes, linkedInProfile, cv, userId));
+				if (skills.isEmpty()) {
+					// no need to check for the skill so add it to the list
+					candidates.add(candidate);
+				} else {
+					// check if the user has the required skills
+					//TODO NEXT: build queries for when the search includes skills for the candidates
+					boolean hasASkill = false;
+
+					for (Skill skill : skills) {
+						// check the candidate has all the skills
+						hasASkill = DaoFactory.getCandidateHasSkillDao().candidateHasSkill(candidate, skill);
+						if(!hasASkill) {
+							break;
+						}
+					}
+					
+					if(hasASkill) {
+						candidates.add(candidate);
+					}
+				}
 			}
 
 		} catch (SQLException e) {

@@ -1,8 +1,5 @@
 package database;
 
-import interfaces.ServerInterface;
-
-
 /**
  * Returns all DAO instances.
  * @author Charlie
@@ -30,5 +27,9 @@ public final class DaoFactory {
 
 	public static SkillDao getSkillDao() {
 		return new SkillDao();
+	}
+	
+	public static CandidateHasSkillDao getCandidateHasSkillDao() {
+		return new CandidateHasSkillDao();
 	}
 }
