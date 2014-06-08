@@ -1,5 +1,7 @@
 package database;
 
+import database.beans.Candidate;
+
 /**
  * Returns all DAO instances.
  * @author Charlie

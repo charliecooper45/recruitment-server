@@ -326,4 +326,64 @@ public class CandidateDao {
 		}
 		return true;
 	}
+
+	public boolean addCandidateCv(Candidate candidate, RemoteInputStream remoteFileData, String oldFileName) {
+		PreparedStatement statement = null;
+		InputStream fileData;
+
+		// add the cv to the folder
+		try {
+			//delete the old file if it exists
+			Path path = Paths.get(ServerMain.CANDIDATE_CV_FOLDER + "/" + oldFileName);
+			if (Files.exists(path))
+				Files.delete(path);
+
+			// add the new file
+			fileData = RemoteInputStreamClient.wrap(remoteFileData);
+			path = ServerMain.getCorrectFilePath(ServerMain.CANDIDATE_CV_FOLDER, candidate.getCV());
+			ServerMain.storeFile(fileData, path);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		// update the database
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE candidate SET cv = ? WHERE candidate_id = ?");
+			statement.setString(1, candidate.getCV());
+			statement.setInt(2, candidate.getId());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	public boolean removeCandidateCv(Candidate candidate) {
+		PreparedStatement statement = null;
+
+		try {
+			//delete the file
+			Path path = Paths.get(ServerMain.CANDIDATE_CV_FOLDER + "/" + candidate.getCV());
+			Files.delete(path);
+		} catch (IOException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+
+		// update the database
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE candidate SET cv = null WHERE candidate_id = ?");
+			statement.setInt(1, candidate.getId());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
 }

@@ -179,4 +179,14 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public boolean removeLinkedInProfile(Candidate candidate) throws RemoteException {
 		return theServer.removeLinkedInProfile(candidate);
 	}
+
+	@Override
+	public boolean addCandidateCv(Candidate candidate, RemoteInputStream remoteFileData, String oldFileName) throws RemoteException {
+		return theServer.addCandidateCv(candidate, remoteFileData, oldFileName);
+	}
+
+	@Override
+	public boolean removeCandidateCv(Candidate candidate) throws RemoteException {
+		return theServer.removeCandidateCv(candidate);
+	}
 }

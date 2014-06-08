@@ -172,4 +172,14 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public boolean removeLinkedInProfile(Candidate candidate) throws RemoteException {
 		return DaoFactory.getCandidateDao().removeLinkedInProfile(candidate);
 	}
+
+	@Override
+	public boolean addCandidateCv(Candidate candidate, RemoteInputStream remoteFileData, String oldFileName) throws RemoteException {
+		return DaoFactory.getCandidateDao().addCandidateCv(candidate, remoteFileData, oldFileName);
+	}
+
+	@Override
+	public boolean removeCandidateCv(Candidate candidate) throws RemoteException {
+		return DaoFactory.getCandidateDao().removeCandidateCv(candidate);
+	}
 }
