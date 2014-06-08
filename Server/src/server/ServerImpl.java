@@ -3,6 +3,7 @@ package server;
 import interfaces.ServerInterface;
 import interfaces.UserType;
 
+import java.net.URL;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
@@ -160,5 +161,15 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public RemoteInputStream getCandidateCV(String fileName) throws RemoteException {
 		return DaoFactory.getCandidateDao().getCandidateCV(fileName);
+	}
+
+	@Override
+	public boolean addLinkedInProfile(Candidate candidate, URL profileURL) throws RemoteException {
+		return DaoFactory.getCandidateDao().addLinkedInProfile(candidate, profileURL);
+	}
+
+	@Override
+	public boolean removeLinkedInProfile(Candidate candidate) throws RemoteException {
+		return DaoFactory.getCandidateDao().removeLinkedInProfile(candidate);
 	}
 }

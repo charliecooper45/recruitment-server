@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -237,7 +238,6 @@ public class CandidateDao {
 		return candidates;
 	}
 
-	
 	public Candidate getCandidate(int candidateId) {
 		PreparedStatement statement;
 		Candidate candidate = null;
@@ -272,7 +272,6 @@ public class CandidateDao {
 		return candidate;
 	}
 
-
 	public RemoteInputStream getCandidateCV(String fileName) {
 		String fileLocation = ServerMain.CANDIDATE_CV_FOLDER + "/" + fileName;
 		Path path = Paths.get(fileLocation);
@@ -287,5 +286,44 @@ public class CandidateDao {
 		}
 		RemoteInputStreamServer remoteFileData = new SimpleRemoteInputStream(inputStream);
 		return remoteFileData;
+	}
+
+	public boolean addLinkedInProfile(Candidate candidate, URL profileURL) {
+		PreparedStatement statement;
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE candidate SET linkedin_profile = ? WHERE candidate_id = ?");
+			statement.setString(1, profileURL.toString());
+			statement.setInt(2, candidate.getId());
+			
+			int i = statement.executeUpdate();
+			if(i == 0) {
+				return false;
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	public boolean removeLinkedInProfile(Candidate candidate) {
+		PreparedStatement statement;
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE candidate SET linkedin_profile = null WHERE candidate_id = ?");
+			statement.setInt(1, candidate.getId());
+			
+			int i = statement.executeUpdate();
+			if(i == 0) {
+				return false;
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 }
