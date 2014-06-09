@@ -22,6 +22,7 @@ import com.healthmarketscience.rmiio.RemoteInputStreamClient;
 import com.healthmarketscience.rmiio.RemoteInputStreamServer;
 import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 
+import database.beans.Event;
 import database.beans.User;
 import database.beans.Vacancy;
 

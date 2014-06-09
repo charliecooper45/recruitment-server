@@ -1,5 +1,6 @@
 package database;
 
+import interfaces.ServerInterface;
 import database.beans.Candidate;
 
 /**
@@ -33,5 +34,9 @@ public final class DaoFactory {
 	
 	public static CandidateHasSkillDao getCandidateHasSkillDao() {
 		return new CandidateHasSkillDao();
+	}
+
+	public static EventDao getEventDao() {
+		return new EventDao();
 	}
 }
