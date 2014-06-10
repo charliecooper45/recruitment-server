@@ -11,6 +11,7 @@ import java.util.List;
 import database.beans.Candidate;
 import database.beans.Event;
 import database.beans.EventType;
+import database.beans.Vacancy;
 
 /**
  * Processes requests for the event table in the recruitment database.
@@ -61,5 +62,41 @@ public class EventDao {
 		}
 
 		return shortlist;
+	}
+
+	public boolean addCandidatesToShortlist(List<Candidate> candidates, Vacancy vacancy, String userId) {
+		boolean candidateAdded = false;
+		PreparedStatement statement = null;
+		int count = 0;
+
+		for (Candidate candidate : candidates) {
+			try (Connection conn = DatabaseConnectionPool.getConnection()) {
+				// check if the candidate is already shortlisted on this vacancy
+				statement = conn.prepareStatement("SELECT COUNT(*) AS count FROM event WHERE candidate_candidate_id = ? AND vacancy_vacancy_id = ? AND event_type_event_type_name = 'SHORTLIST'");
+				statement.setInt(1, candidate.getId());
+				statement.setInt(2, vacancy.getVacancyId());
+				ResultSet rs = statement.executeQuery();
+				if (rs.next()) {
+					count = rs.getInt("count");
+				}
+
+				if (count == 0) {
+					// add the candidate to the shortlist as it is not present
+					statement = conn.prepareStatement("INSERT INTO event (event_date, event_time, candidate_candidate_id, user_user_id, vacancy_vacancy_id, event_type_event_type_name) " + "VALUES (CURDATE(), CURTIME(), ?, ?, ?, 'SHORTLIST')");
+					statement.setInt(1, candidate.getId());
+					statement.setString(2, userId);
+					statement.setInt(3, vacancy.getVacancyId());
+					int value = statement.executeUpdate();
+					if (value != 0) {
+						candidateAdded = true;
+					}
+				}
+				count = 0;
+			} catch (SQLException e) {
+				//TODO NEXT: Handle exceptions 
+				e.printStackTrace();
+			}
+		}
+		return candidateAdded;
 	}
 }

@@ -195,4 +195,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public List<Event> getShortlist(int vacancyId) throws RemoteException {
 		return theServer.getShortlist(vacancyId);
 	}
+
+	@Override
+	public boolean addCandidatesToShortlist(List<Candidate> candidates, Vacancy vacancy, String userId) throws RemoteException {
+		return theServer.addCandidatesToShortlist(candidates, vacancy, userId);
+	}
 }
