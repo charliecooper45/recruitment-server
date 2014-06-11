@@ -1,5 +1,9 @@
 package database;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import server.ServerMain;
 
 import database.beans.Candidate;
 import database.beans.Event;
@@ -98,5 +104,26 @@ public class EventDao {
 			}
 		}
 		return candidateAdded;
+	}
+
+	public boolean removeCandidateFromShortlist(int candidateId, int vacancyId) {
+		PreparedStatement statement = null;
+		int returned = 0;
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("DELETE FROM event WHERE candidate_candidate_id = ? AND vacancy_vacancy_id = ? AND event_type_event_type_name = 'SHORTLIST'");
+			statement.setInt(1, candidateId);
+			statement.setInt(2, vacancyId);
+			returned = statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+		if (returned != 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

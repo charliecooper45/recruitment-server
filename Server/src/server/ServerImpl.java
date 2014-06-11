@@ -193,4 +193,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public boolean addCandidatesToShortlist(List<Candidate> candidates, Vacancy vacancy, String userId) throws RemoteException {
 		return DaoFactory.getEventDao().addCandidatesToShortlist(candidates, vacancy, userId);
 	}
+
+	@Override
+	public boolean removeCandidateFromShortlist(int candidateId, int vacancyId) throws RemoteException {
+		return DaoFactory.getEventDao().removeCandidateFromShortlist(candidateId, vacancyId);
+	}
 }
