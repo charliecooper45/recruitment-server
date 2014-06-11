@@ -24,7 +24,6 @@ import com.healthmarketscience.rmiio.RemoteInputStreamServer;
 import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 
 import database.beans.Candidate;
-import database.beans.Organisation;
 import database.beans.Search;
 import database.beans.Skill;
 
@@ -385,5 +384,31 @@ public class CandidateDao {
 			return false;
 		}
 		return true;
+	}
+
+	public boolean updateCandidateDetails(Candidate candidate) {
+		PreparedStatement statement = null;
+		
+		// add the candidate
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE candidate SET job_title = ?, phone_number = ?, email_address = ?, address = ? " +
+					"WHERE candidate_id = ?");
+			statement.setString(1, candidate.getJobTitle());
+			statement.setString(2, candidate.getPhoneNumber());
+			statement.setString(3, candidate.getEmailAddress());
+			statement.setString(4, candidate.getAddress());
+			statement.setInt(5, candidate.getId());
+			int value = statement.executeUpdate();
+			
+			if(value != 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+
+		return false;
 	}
 }

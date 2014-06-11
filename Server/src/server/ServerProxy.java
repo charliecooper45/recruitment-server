@@ -205,4 +205,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public boolean removeCandidateFromShortlist(int candidateId, int vacancyId) throws RemoteException {
 		return theServer.removeCandidateFromShortlist(candidateId, vacancyId);
 	}
+
+	@Override
+	public boolean updateCandidateDetails(Candidate candidate) throws RemoteException {
+		return theServer.updateCandidateDetails(candidate);
+	}
 }
