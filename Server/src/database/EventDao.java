@@ -56,7 +56,7 @@ public class EventDao {
 				if (candidateRS.next()) {
 					candidateFirstName = candidateRS.getString("first_name");
 					candidateSurname = candidateRS.getString("surname");
-					Candidate candidate = new Candidate(candidateId, candidateFirstName, candidateSurname, null, null, null, null, null, null, null, null);
+					Candidate candidate = new Candidate(candidateId, candidateFirstName, candidateSurname, null, -1, null, null, null, null, null, null, null, null);
 					event = new Event(eventType, candidate, eventDate, userId, vacancyId);
 					shortlist.add(event);
 				}

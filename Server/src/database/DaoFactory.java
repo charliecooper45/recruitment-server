@@ -39,4 +39,8 @@ public final class DaoFactory {
 	public static EventDao getEventDao() {
 		return new EventDao();
 	}
+	
+	public static CandidateWorksAtDao getCandidateWorksAtDao() {
+		return new CandidateWorksAtDao();
+	}
 }

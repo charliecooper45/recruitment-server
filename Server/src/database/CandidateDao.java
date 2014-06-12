@@ -24,6 +24,7 @@ import com.healthmarketscience.rmiio.RemoteInputStreamServer;
 import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 
 import database.beans.Candidate;
+import database.beans.Organisation;
 import database.beans.Search;
 import database.beans.Skill;
 
@@ -53,7 +54,7 @@ public class CandidateDao {
 				cv = rs.getString("cv");
 				userId = rs.getString("user_user_id");
 
-				candidates.add(new Candidate(id, firstName, surname, jobTitle, phoneNumber, emailAddress, address, notes, linkedInProfile, cv, userId));
+				candidates.add(new Candidate(id, firstName, surname, jobTitle, -1, null, phoneNumber, emailAddress, address, notes, linkedInProfile, cv, userId));
 			}
 		} catch (SQLException e) {
 			//TODO NEXT: Handle exceptions 
@@ -84,7 +85,7 @@ public class CandidateDao {
 
 		// add the candidate
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
-			statement = conn.prepareStatement("INSERT INTO candidate (first_name, surname, job_title, phone_number, email_address, address, notes, linkedin_profile, cv, user_user_id)" + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			statement = conn.prepareStatement("INSERT INTO candidate (first_name, surname, job_title, phone_number, email_address, address, notes, linkedin_profile, cv, user_user_id)" + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, candidate.getFirstName());
 			statement.setString(2, candidate.getSurname());
 			statement.setString(3, candidate.getJobTitle());
@@ -96,8 +97,17 @@ public class CandidateDao {
 			statement.setString(9, candidate.getCV());
 			statement.setString(10, candidate.getUserId());
 			int value = statement.executeUpdate();
+
+			// add the organisation if the candidate has one
+			if (candidate.getOrganisationId() != -1) {
+				ResultSet rs = statement.getGeneratedKeys();
+				if (rs.next()) {
+					System.err.println(candidate.getOrganisationId());
+					DaoFactory.getCandidateWorksAtDao().addEmployment(rs.getInt(1), candidate.getOrganisationId());
+				}
+			}
 		} catch (SQLException e) {
-			//TODO NEXT: revert here
+			//TODO NEXT: revert here, this is currently adding a candidate regardless
 			e.printStackTrace();
 			return false;
 		}
@@ -122,6 +132,7 @@ public class CandidateDao {
 			}
 		}
 
+		// remove the candidate record
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("DELETE FROM candidate WHERE candidate_id = ?");
 			statement.setInt(1, candidate.getId());
@@ -131,6 +142,7 @@ public class CandidateDao {
 			e.printStackTrace();
 			return false;
 		}
+
 		if (returned != 0) {
 			return true;
 		} else {
@@ -203,8 +215,8 @@ public class CandidateDao {
 				linkedInProfile = rs.getString("linkedin_profile");
 				cv = rs.getString("cv");
 				userId = rs.getString("user_user_id");
-				
-				Candidate candidate = new Candidate(id, firstName, surname, jobTitle, phoneNumber, emailAddress, address, notes, linkedInProfile, cv, userId);
+
+				Candidate candidate = new Candidate(id, firstName, surname, jobTitle, -1, null, phoneNumber, emailAddress, address, notes, linkedInProfile, cv, userId);
 
 				if (skills.isEmpty()) {
 					// no need to check for the skill so add it to the list
@@ -217,12 +229,12 @@ public class CandidateDao {
 					for (Skill skill : skills) {
 						// check the candidate has all the skills
 						hasASkill = DaoFactory.getCandidateHasSkillDao().candidateHasSkill(candidate, skill);
-						if(!hasASkill) {
+						if (!hasASkill) {
 							break;
 						}
 					}
-					
-					if(hasASkill) {
+
+					if (hasASkill) {
 						candidates.add(candidate);
 					}
 				}
@@ -242,10 +254,11 @@ public class CandidateDao {
 		Candidate candidate = null;
 		String firstName = null, surname = null, jobTitle = null, phoneNumber = null, emailAddress = null, address = null, notes = null, linkedInProfile = null, cv = null, userId = null;
 		int id = -1;
+		int organisationId = -1;
+		String organisationName = null;
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
-			statement = conn.prepareStatement("SELECT candidate_id, first_name, surname, job_title, phone_number, email_address, address, notes, linkedin_profile, " +
-					"cv, user_user_id FROM candidate WHERE candidate_id = ?");
+			statement = conn.prepareStatement("SELECT candidate_id, first_name, surname, job_title, phone_number, email_address, address, notes, linkedin_profile, " + "cv, user_user_id FROM candidate WHERE candidate_id = ?");
 			statement.setInt(1, candidateId);
 
 			ResultSet rs = statement.executeQuery();
@@ -262,7 +275,15 @@ public class CandidateDao {
 				cv = rs.getString("cv");
 				userId = rs.getString("user_user_id");
 			}
-			candidate = new Candidate(id, firstName, surname, jobTitle, phoneNumber, emailAddress, address, notes, linkedInProfile, cv, userId);
+
+			// check if the candidate works at an organisation and if they do add this information to the Candidate object
+			Organisation organisation = DaoFactory.getCandidateWorksAtDao().getCandididateOrganisation(id);
+			if (organisation != null) {
+				organisationId = organisation.getId();
+				organisationName = organisation.getOrganisationName();
+			}
+
+			candidate = new Candidate(id, firstName, surname, jobTitle, organisationId, organisationName, phoneNumber, emailAddress, address, notes, linkedInProfile, cv, userId);
 		} catch (SQLException e) {
 			//TODO NEXT: Handle exceptions 
 			e.printStackTrace();
@@ -294,9 +315,9 @@ public class CandidateDao {
 			statement = conn.prepareStatement("UPDATE candidate SET linkedin_profile = ? WHERE candidate_id = ?");
 			statement.setString(1, profileURL.toString());
 			statement.setInt(2, candidate.getId());
-			
+
 			int i = statement.executeUpdate();
-			if(i == 0) {
+			if (i == 0) {
 				return false;
 			}
 		} catch (SQLException e) {
@@ -313,9 +334,9 @@ public class CandidateDao {
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("UPDATE candidate SET linkedin_profile = null WHERE candidate_id = ?");
 			statement.setInt(1, candidate.getId());
-			
+
 			int i = statement.executeUpdate();
-			if(i == 0) {
+			if (i == 0) {
 				return false;
 			}
 		} catch (SQLException e) {
@@ -388,27 +409,29 @@ public class CandidateDao {
 
 	public boolean updateCandidateDetails(Candidate candidate) {
 		PreparedStatement statement = null;
-		
+
 		// add the candidate
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
-			statement = conn.prepareStatement("UPDATE candidate SET job_title = ?, phone_number = ?, email_address = ?, address = ? " +
-					"WHERE candidate_id = ?");
+			statement = conn.prepareStatement("UPDATE candidate SET job_title = ?, phone_number = ?, email_address = ?, address = ? " + "WHERE candidate_id = ?");
 			statement.setString(1, candidate.getJobTitle());
 			statement.setString(2, candidate.getPhoneNumber());
 			statement.setString(3, candidate.getEmailAddress());
 			statement.setString(4, candidate.getAddress());
 			statement.setInt(5, candidate.getId());
 			int value = statement.executeUpdate();
-			
-			if(value != 0) {
-				return true;
+
+			// delete any existing record then insert the new record to show where the candidate works
+			DaoFactory.getCandidateWorksAtDao().removeEmployment(candidate.getId());
+
+			if (candidate.getOrganisationId() != -1) {
+				DaoFactory.getCandidateWorksAtDao().addEmployment(candidate.getId(), candidate.getOrganisationId());
 			}
+
+			return true;
 		} catch (SQLException e) {
 			//TODO NEXT: revert here
 			e.printStackTrace();
 			return false;
 		}
-
-		return false;
 	}
 }
