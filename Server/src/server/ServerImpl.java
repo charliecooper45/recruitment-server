@@ -12,6 +12,7 @@ import com.healthmarketscience.rmiio.RemoteInputStream;
 
 import database.DaoFactory;
 import database.beans.Candidate;
+import database.beans.CandidateSkill;
 import database.beans.Contact;
 import database.beans.Event;
 import database.beans.Organisation;
@@ -202,5 +203,20 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public boolean updateCandidateDetails(Candidate candidate) throws RemoteException {
 		return DaoFactory.getCandidateDao().updateCandidateDetails(candidate);
+	}
+
+	@Override
+	public List<CandidateSkill> getCandidateSkills(int candidateId) throws RemoteException {
+		return DaoFactory.getCandidateHasSkillDao().getCandidateSkills(candidateId);
+	}
+	
+	@Override
+	public boolean addSkillToCandidate(Skill skill, Candidate candidate, String userId) throws RemoteException {
+		return DaoFactory.getCandidateHasSkillDao().addSkillToCandidate(skill, candidate, userId);
+	}
+	
+	@Override
+	public boolean removeSkillFromCandidate(Skill skill, Candidate candidate) throws RemoteException {
+		return DaoFactory.getCandidateHasSkillDao().removeSkillFromCandidate(skill, candidate);
 	}
 }
