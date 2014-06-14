@@ -22,7 +22,7 @@ import com.healthmarketscience.rmiio.RemoteInputStreamClient;
 import com.healthmarketscience.rmiio.RemoteInputStreamServer;
 import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 
-import database.beans.Event;
+import database.beans.Candidate;
 import database.beans.User;
 import database.beans.Vacancy;
 
@@ -314,6 +314,26 @@ public class VacancyDao {
 		if(returned != 0) {
 			return true;
 		} else {
+			return false;
+		}
+	}
+
+	public boolean updateVacancyDetails(Vacancy vacancy) {
+		PreparedStatement statement = null;
+
+		// update the vacancy
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE vacancy SET vacancy_status = ?, vacancy_date = ?, contact_contact_id = ? WHERE vacancy_id = ?");
+			statement.setBoolean(1, vacancy.getStatus());
+			statement.setObject(2, vacancy.getVacancyDate());
+			statement.setInt(3, vacancy.getContactId());
+			statement.setInt(4, vacancy.getVacancyId());
+			int value = statement.executeUpdate();
+
+			return true;
+		} catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
 			return false;
 		}
 	}

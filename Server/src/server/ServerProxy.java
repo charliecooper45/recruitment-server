@@ -226,4 +226,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public boolean removeSkillFromCandidate(Skill skill, Candidate candidate) throws RemoteException {
 		return theServer.removeSkillFromCandidate(skill, candidate);
 	}
+
+	@Override
+	public boolean updateVacancyDetails(Vacancy vacancy) throws RemoteException {
+		return theServer.updateVacancyDetails(vacancy);
+	}
 }
