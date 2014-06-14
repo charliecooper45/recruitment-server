@@ -19,7 +19,6 @@ public class ContactDao {
 	public List<Contact> getOrganisationsContacts(Organisation organisation) {
 		List<Contact> contacts = new ArrayList<>();
 		int id = -1;
-		
 		//TODO NEXT B: Not all of these variables are used below
 		String firstName, surname, jobTitle, phoneNumber, emailAddress, address, notes, organisationId, userId;
 		
@@ -33,7 +32,8 @@ public class ContactDao {
 				id = rs.getInt("contact_id");
 				firstName = rs.getString("first_name");
 				surname = rs.getString("surname");
-				contacts.add(new Contact(id, firstName, surname, null, null, null, null, null, -1, null));
+				phoneNumber = rs.getString("phone_number");
+				contacts.add(new Contact(id, firstName, surname, null, phoneNumber, null, null, null, -1, null));
 			}
 		} catch(SQLException e) {
 			//TODO NEXT: Handle exceptions 

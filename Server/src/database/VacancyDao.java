@@ -22,7 +22,6 @@ import com.healthmarketscience.rmiio.RemoteInputStreamClient;
 import com.healthmarketscience.rmiio.RemoteInputStreamServer;
 import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 
-import database.beans.Candidate;
 import database.beans.User;
 import database.beans.Vacancy;
 
@@ -83,9 +82,7 @@ public class VacancyDao {
 				if (conRs.next()) {
 					contactName = conRs.getString("first_name") + " " + conRs.getString("surname");
 					contactPhoneNumber = conRs.getString("phone_number");
-				} else {
-					continue;
-				}
+				} 
 
 				Vacancy vacancy = new Vacancy(vacancyId, vacancyStatus, name, date, text, profile, organisationId, organisationName, userId, contactId, contactName, contactPhoneNumber);
 				vacancies.add(vacancy);
@@ -137,9 +134,7 @@ public class VacancyDao {
 				if (conRs.next()) {
 					contactPhoneNumber = conRs.getString("phone_number");
 					contactName = conRs.getString("first_name") + " " + conRs.getString("surname");
-				} else {
-					return null;
-				}
+				} 
 
 				vacancy = new Vacancy(vacancyId, vacancyStatus, name, date, text, profile, organisationId, organisationName, userId, contactId, contactName, contactPhoneNumber);
 			}
@@ -326,7 +321,11 @@ public class VacancyDao {
 			statement = conn.prepareStatement("UPDATE vacancy SET vacancy_status = ?, vacancy_date = ?, contact_contact_id = ? WHERE vacancy_id = ?");
 			statement.setBoolean(1, vacancy.getStatus());
 			statement.setObject(2, vacancy.getVacancyDate());
-			statement.setInt(3, vacancy.getContactId());
+			if(vacancy.getContactId() != -1) {
+				statement.setInt(3, vacancy.getContactId());
+			} else {
+				statement.setObject(3, null);
+			}
 			statement.setInt(4, vacancy.getVacancyId());
 			int value = statement.executeUpdate();
 

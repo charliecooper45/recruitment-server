@@ -224,4 +224,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public boolean updateVacancyDetails(Vacancy vacancy) throws RemoteException {
 		return DaoFactory.getVacancyDao().updateVacancyDetails(vacancy);
 	}
+
+	@Override
+	public boolean updateOrganisationDetails(Organisation organisation) throws RemoteException {
+		return DaoFactory.getOrganisationDao().updateOrganisationDetails(organisation);
+	}
 }

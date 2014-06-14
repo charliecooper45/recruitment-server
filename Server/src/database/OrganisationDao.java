@@ -194,8 +194,7 @@ public class OrganisationDao {
 
 		// add the organisation
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
-			statement = conn.prepareStatement("INSERT INTO organisation (organisation_name, phone_number, email_address, website, address, terms_of_business, " +
-					"notes, user_user_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+			statement = conn.prepareStatement("INSERT INTO organisation (organisation_name, phone_number, email_address, website, address, terms_of_business, " + "notes, user_user_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
 			statement.setString(1, organisation.getOrganisationName());
 			statement.setString(2, organisation.getPhoneNumber());
 			statement.setString(3, organisation.getEmailAddress());
@@ -213,13 +212,13 @@ public class OrganisationDao {
 
 		return true;
 	}
-	
+
 	public boolean removeOrganisation(Organisation organisation) {
 		PreparedStatement statement = null;
 		int returned = 0;
-		
+
 		// remove the TOB if they are present
-		if(organisation.getTermsOfBusiness() != null) {
+		if (organisation.getTermsOfBusiness() != null) {
 			try {
 				//delete the file
 				Path path = Paths.get(ServerMain.ORGANISATION_TOB_FOLDER + "/" + organisation.getTermsOfBusiness());
@@ -240,9 +239,30 @@ public class OrganisationDao {
 			e.printStackTrace();
 			return false;
 		}
-		if(returned != 0) {
+		if (returned != 0) {
 			return true;
 		} else {
+			return false;
+		}
+	}
+
+	public boolean updateOrganisationDetails(Organisation organisation) {
+		PreparedStatement statement = null;
+
+		// add the candidate
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE organisation SET phone_number = ?, email_address = ?, website = ?, address = ? " + "WHERE organisation_id = ?");
+			statement.setString(1, organisation.getPhoneNumber());
+			statement.setString(2, organisation.getEmailAddress());
+			statement.setString(3, organisation.getWebsite());
+			statement.setString(4, organisation.getAddress());
+			statement.setInt(5, organisation.getId());
+			int value = statement.executeUpdate();
+
+			return true;
+		} catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
 			return false;
 		}
 	}
