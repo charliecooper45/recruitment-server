@@ -1,18 +1,13 @@
 package database;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import server.ServerMain;
 
 import database.beans.Candidate;
 import database.beans.Event;
@@ -125,5 +120,48 @@ public class EventDao {
 		} else {
 			return false;
 		}
+	}
+
+	public List<Event> getCandidateEvents(int candidateId) {
+		PreparedStatement statement = null;
+		List<Event> events = new ArrayList<>();
+		Date date = null;
+		Time time = null;
+		EventType eventType = null;
+		int vacancyId = -1;
+		String vacancyName = null;
+		String userId = null;
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("SELECT event_date, event_time, event_type_event_type_name, user_user_id, vacancy_vacancy_id FROM event WHERE candidate_candidate_id = ?");
+			statement.setInt(1, candidateId);
+			
+			ResultSet rs = statement.executeQuery();
+			while(rs.next()) {
+				date = rs.getDate("event_date");
+				time = rs.getTime("event_time");
+				eventType = EventType.valueOf(rs.getString("event_type_event_type_name"));
+				vacancyId = rs.getInt("vacancy_vacancy_id");
+				userId = rs.getString("user_user_id");
+				
+				// get the vacancy name
+				PreparedStatement vacancyStatement = conn.prepareStatement("SELECT name FROM vacancy WHERE vacancy_id = ?");
+				vacancyStatement.setInt(1, vacancyId);
+				
+				ResultSet vacancyRs = vacancyStatement.executeQuery();
+				if(vacancyRs.next()) {
+					vacancyName = vacancyRs.getString("name");
+				}
+				
+				Event event = new Event(eventType, null, date, time, userId, vacancyId, vacancyName);
+				events.add(event);
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return null;
+		}
+
+		return events;
 	}
 }
