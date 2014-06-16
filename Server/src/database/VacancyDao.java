@@ -336,4 +336,31 @@ public class VacancyDao {
 			return false;
 		}
 	}
+
+	public List<Vacancy> getOrganisationVacancies(int organisationId) {
+		List<Vacancy> vacancies = new ArrayList<>();
+		PreparedStatement statement = null;
+		int vacancyId = -1;
+		String vacancyName = null;
+		
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("SELECT vacancy_id, name FROM vacancy WHERE organisation_organisation_id = ?");
+			statement.setInt(1, organisationId);
+
+			ResultSet rs = statement.executeQuery();
+			while (rs.next()) {
+				vacancyId = rs.getInt("vacancy_id");
+				vacancyName = rs.getString("name");
+				
+				Vacancy vacancy = new Vacancy(vacancyId, false, vacancyName, null, null, null, -1, null, null, -1, null, null);
+				vacancies.add(vacancy);
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return null;
+		}
+		
+		return vacancies;
+	}
 }

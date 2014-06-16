@@ -241,4 +241,14 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public List<Event> getCandidateEvents(int candidateId) throws RemoteException {
 		return theServer.getCandidateEvents(candidateId);
 	}
+
+	@Override
+	public List<Vacancy> getOrganisationVacancies(int organisationId) throws RemoteException {
+		return theServer.getOrganisationVacancies(organisationId);
+	}
+
+	@Override
+	public boolean addEvent(Event event) throws RemoteException {
+		return theServer.addEvent(event);
+	}
 }

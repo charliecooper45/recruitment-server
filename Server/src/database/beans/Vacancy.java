@@ -103,11 +103,15 @@ public class Vacancy implements Serializable, Comparable<Vacancy> {
 	
 	@Override
 	public String toString() {
-		String statusString = "open";
-		if(!status) {
-			statusString = "closed";
+		if (organisationName != null) {
+			String statusString = "open";
+			if (!status) {
+				statusString = "closed";
+			}
+			return name + " @ " + organisationName + " (" + statusString + ")";
+		} else {
+			return vacancyId + ": " + name;
 		}
-		return name + " @ " + organisationName + " (" + statusString + ")";
 	}
 	
 	@Override

@@ -164,4 +164,29 @@ public class EventDao {
 
 		return events;
 	}
+
+	public boolean addEvent(Event event) {
+		PreparedStatement statement = null;
+		
+		try(Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("INSERT INTO event (event_date, event_time, candidate_candidate_id, user_user_id, vacancy_vacancy_id, event_type_event_type_name) " +
+					"VALUES (?, ?, ?, ?, ?, ?)");
+			statement.setDate(1, (java.sql.Date) event.getDate());
+			statement.setTime(2, event.getTime());
+			statement.setInt(3, event.getCandidate().getId());
+			statement.setString(4, event.getUserId());
+			statement.setInt(5, event.getVacancyId());
+			statement.setString(6, String.valueOf(event.getEventType()));
+			
+			int updated = statement.executeUpdate();
+			if(updated == 0) {
+				return false;
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
 }
