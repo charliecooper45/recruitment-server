@@ -129,15 +129,17 @@ public class EventDao {
 		Time time = null;
 		EventType eventType = null;
 		int vacancyId = -1;
+		int eventId = -1;
 		String vacancyName = null;
 		String userId = null;
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
-			statement = conn.prepareStatement("SELECT event_date, event_time, event_type_event_type_name, user_user_id, vacancy_vacancy_id FROM event WHERE candidate_candidate_id = ?");
+			statement = conn.prepareStatement("SELECT event_id, event_date, event_time, event_type_event_type_name, user_user_id, vacancy_vacancy_id FROM event WHERE candidate_candidate_id = ?");
 			statement.setInt(1, candidateId);
 			
 			ResultSet rs = statement.executeQuery();
 			while(rs.next()) {
+				eventId = rs.getInt("event_id");
 				date = rs.getDate("event_date");
 				time = rs.getTime("event_time");
 				eventType = EventType.valueOf(rs.getString("event_type_event_type_name"));
@@ -154,6 +156,7 @@ public class EventDao {
 				}
 				
 				Event event = new Event(eventType, null, date, time, userId, vacancyId, vacancyName);
+				event.setEventId(eventId);
 				events.add(event);
 			}
 		} catch (SQLException e) {
@@ -171,13 +174,32 @@ public class EventDao {
 		try(Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("INSERT INTO event (event_date, event_time, candidate_candidate_id, user_user_id, vacancy_vacancy_id, event_type_event_type_name) " +
 					"VALUES (?, ?, ?, ?, ?, ?)");
-			statement.setDate(1, (java.sql.Date) event.getDate());
+			statement.setDate(1, new java.sql.Date(event.getDate().getTime()));
 			statement.setTime(2, event.getTime());
 			statement.setInt(3, event.getCandidate().getId());
 			statement.setString(4, event.getUserId());
 			statement.setInt(5, event.getVacancyId());
 			statement.setString(6, String.valueOf(event.getEventType()));
-			
+
+			int updated = statement.executeUpdate();
+			if(updated == 0) {
+				return false;
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	public boolean removeEvent(int eventId) {
+		PreparedStatement statement = null;
+		
+		try(Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("DELETE FROM event WHERE event_id = ?");
+			statement.setInt(1, eventId);
+
 			int updated = statement.executeUpdate();
 			if(updated == 0) {
 				return false;

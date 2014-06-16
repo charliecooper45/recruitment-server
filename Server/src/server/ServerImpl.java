@@ -244,4 +244,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public boolean addEvent(Event event) throws RemoteException {
 		return DaoFactory.getEventDao().addEvent(event);
 	}
+
+	@Override
+	public boolean removeEvent(int eventId) throws RemoteException {
+		return DaoFactory.getEventDao().removeEvent(eventId);
+	}
 }

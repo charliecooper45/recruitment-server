@@ -251,4 +251,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public boolean addEvent(Event event) throws RemoteException {
 		return theServer.addEvent(event);
 	}
+
+	@Override
+	public boolean removeEvent(int eventId) throws RemoteException {
+		return theServer.removeEvent(eventId);
+	}
 }
