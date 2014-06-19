@@ -1,7 +1,5 @@
 package database;
 
-import interfaces.ServerInterface;
-import database.beans.Candidate;
 
 /**
  * Returns all DAO instances.

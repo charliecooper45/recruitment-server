@@ -434,4 +434,25 @@ public class CandidateDao {
 			return false;
 		}
 	}
+
+	public boolean saveCandidateNotes(int candidateId, String notes) {
+		PreparedStatement statement = null;
+		
+		try(Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE candidate SET notes = ? WHERE candidate_id = ?");
+			statement.setString(1, notes);
+			statement.setInt(2, candidateId);
+			
+			int result = statement.executeUpdate();
+			
+			if(result == 0) {
+				return false;
+			}
+		}  catch (SQLException e) {
+			//TODO NEXT: revert here
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
 }
