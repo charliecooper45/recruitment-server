@@ -102,7 +102,6 @@ public class CandidateDao {
 			if (candidate.getOrganisationId() != -1) {
 				ResultSet rs = statement.getGeneratedKeys();
 				if (rs.next()) {
-					System.err.println(candidate.getOrganisationId());
 					DaoFactory.getCandidateWorksAtDao().addEmployment(rs.getInt(1), candidate.getOrganisationId());
 				}
 			}

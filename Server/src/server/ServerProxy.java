@@ -261,4 +261,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public boolean saveCandidateNotes(int candidateId, String notes) throws RemoteException {
 		return theServer.saveCandidateNotes(candidateId, notes);
 	}
+
+	@Override
+	public List<Event> getEvents(boolean shortlist, boolean cvSent, boolean interview, boolean placement, boolean user, String userId) throws RemoteException {
+		return theServer.getEvents(shortlist, cvSent, interview, placement, user, userId);
+	}
 }

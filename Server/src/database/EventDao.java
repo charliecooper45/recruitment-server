@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import database.beans.Candidate;
@@ -52,7 +53,7 @@ public class EventDao {
 					candidateFirstName = candidateRS.getString("first_name");
 					candidateSurname = candidateRS.getString("surname");
 					Candidate candidate = new Candidate(candidateId, candidateFirstName, candidateSurname, null, -1, null, null, null, null, null, null, null, null);
-					event = new Event(eventType, candidate, eventDate, userId, vacancyId);
+					event = new Event(eventType, candidate, eventDate, null, userId, new Vacancy(vacancyId, null));
 					shortlist.add(event);
 				}
 			}
@@ -136,26 +137,26 @@ public class EventDao {
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("SELECT event_id, event_date, event_time, event_type_event_type_name, user_user_id, vacancy_vacancy_id FROM event WHERE candidate_candidate_id = ?");
 			statement.setInt(1, candidateId);
-			
+
 			ResultSet rs = statement.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				eventId = rs.getInt("event_id");
 				date = rs.getDate("event_date");
 				time = rs.getTime("event_time");
 				eventType = EventType.valueOf(rs.getString("event_type_event_type_name"));
 				vacancyId = rs.getInt("vacancy_vacancy_id");
 				userId = rs.getString("user_user_id");
-				
+
 				// get the vacancy name
 				PreparedStatement vacancyStatement = conn.prepareStatement("SELECT name FROM vacancy WHERE vacancy_id = ?");
 				vacancyStatement.setInt(1, vacancyId);
-				
+
 				ResultSet vacancyRs = vacancyStatement.executeQuery();
-				if(vacancyRs.next()) {
+				if (vacancyRs.next()) {
 					vacancyName = vacancyRs.getString("name");
 				}
-				
-				Event event = new Event(eventType, null, date, time, userId, vacancyId, vacancyName);
+
+				Event event = new Event(eventType, null, date, time, userId, new Vacancy(vacancyId, vacancyName));
 				event.setEventId(eventId);
 				events.add(event);
 			}
@@ -170,10 +171,9 @@ public class EventDao {
 
 	public boolean addEvent(Event event) {
 		PreparedStatement statement = null;
-		
-		try(Connection conn = DatabaseConnectionPool.getConnection()) {
-			statement = conn.prepareStatement("INSERT INTO event (event_date, event_time, candidate_candidate_id, user_user_id, vacancy_vacancy_id, event_type_event_type_name) " +
-					"VALUES (?, ?, ?, ?, ?, ?)");
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("INSERT INTO event (event_date, event_time, candidate_candidate_id, user_user_id, vacancy_vacancy_id, event_type_event_type_name) " + "VALUES (?, ?, ?, ?, ?, ?)");
 			statement.setDate(1, new java.sql.Date(event.getDate().getTime()));
 			statement.setTime(2, event.getTime());
 			statement.setInt(3, event.getCandidate().getId());
@@ -182,7 +182,7 @@ public class EventDao {
 			statement.setString(6, String.valueOf(event.getEventType()));
 
 			int updated = statement.executeUpdate();
-			if(updated == 0) {
+			if (updated == 0) {
 				return false;
 			}
 		} catch (SQLException e) {
@@ -195,13 +195,13 @@ public class EventDao {
 
 	public boolean removeEvent(int eventId) {
 		PreparedStatement statement = null;
-		
-		try(Connection conn = DatabaseConnectionPool.getConnection()) {
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("DELETE FROM event WHERE event_id = ?");
 			statement.setInt(1, eventId);
 
 			int updated = statement.executeUpdate();
-			if(updated == 0) {
+			if (updated == 0) {
 				return false;
 			}
 		} catch (SQLException e) {
@@ -210,5 +210,82 @@ public class EventDao {
 			return false;
 		}
 		return true;
+	}
+
+	public List<Event> getEvents(boolean shortlist, boolean cvSent, boolean interview, boolean placement, boolean user, String userId) {
+		Event event = null;
+		List<Event> events = new ArrayList<>();
+		PreparedStatement statement = null;
+		String userType = "%";
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("SELECT first_name, surname, event_type_event_type_name, event_date, event.user_user_id, name, organisation_name, candidate_id " +
+					"FROM (event INNER JOIN candidate ON candidate_candidate_id = candidate_id) INNER JOIN " +
+					"(vacancy INNER JOIN organisation ON organisation_organisation_id = organisation_id) ON vacancy_vacancy_id = vacancy_id " +
+					"WHERE event.user_user_id LIKE ? AND vacancy_status = true");
+			if(user) {
+				userType = userId;
+			}
+			statement.setString(1, userType);
+			
+			ResultSet rs = statement.executeQuery();
+			while(rs.next()) {
+				String firstName = rs.getString("first_name");
+				String surname = rs.getString("surname");
+				EventType eventType = EventType.valueOf(rs.getString("event_type_event_type_name"));
+				Date date = rs.getDate("event_date");
+				String eventUserId = rs.getString("event.user_user_id");
+				String vacancyName = rs.getString("name");
+				String organisationName = rs.getString("organisation_name");
+				int candidateId = rs.getInt("candidate_id");
+				
+				Candidate candidate = new Candidate(candidateId, firstName, surname, null, -1, null, null, null, null, null, null, null, null);
+				Vacancy vacancy = new Vacancy(-1, false, vacancyName, null, null, null, -1, organisationName, null, -1, null, null);
+				event = new Event(eventType, candidate, date, null, eventUserId, vacancy);
+				events.add(event);
+			}
+			
+			// remove any events that are not meant to be in the list
+			Iterator<Event> iterator = events.iterator();
+			while(iterator.hasNext()) {
+				Event currentEvent = iterator.next();
+				
+				if(!shortlist) {
+					if(currentEvent.getEventType() == EventType.SHORTLIST) {
+						iterator.remove();
+					}
+				} 
+				if(!cvSent) {
+					if(currentEvent.getEventType() == EventType.CV_SENT) {
+						iterator.remove();
+					}
+				} 
+				if(!interview) {
+					if(currentEvent.getEventType() == EventType.PHONE_INTERVIEW) {
+						iterator.remove();
+					} else if(currentEvent.getEventType() == EventType.INTERVIEW_1) {
+						iterator.remove();
+					} else if(currentEvent.getEventType() == EventType.INTERVIEW_2) {
+						iterator.remove();
+					} else if (currentEvent.getEventType() == EventType.INTERVIEW_3) {
+						iterator.remove();
+					} else if(currentEvent.getEventType() == EventType.INTERVIEW_4) {
+						iterator.remove();
+					} else if(currentEvent.getEventType() == EventType.FINAL_INTERVIEW) {
+						iterator.remove();
+					}
+				}
+				if(!placement) {
+					if(currentEvent.getEventType() == EventType.PLACEMENT) {
+						iterator.remove();
+					}
+				}
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return null;
+		}
+		return events;
 	}
 }

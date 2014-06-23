@@ -254,4 +254,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public boolean saveCandidateNotes(int candidateId, String notes) throws RemoteException {
 		return DaoFactory.getCandidateDao().saveCandidateNotes(candidateId, notes);
 	}
+
+	@Override
+	public List<Event> getEvents(boolean shortlist, boolean cvSent, boolean interview, boolean placement, boolean user, String userId) throws RemoteException {
+		return DaoFactory.getEventDao().getEvents(shortlist, cvSent, interview, placement, user, userId);
+	}
 }
