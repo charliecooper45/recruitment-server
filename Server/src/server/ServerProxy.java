@@ -17,6 +17,7 @@ import database.beans.Event;
 import database.beans.Organisation;
 import database.beans.Search;
 import database.beans.Skill;
+import database.beans.Task;
 import database.beans.User;
 import database.beans.Vacancy;
 
@@ -265,5 +266,10 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	@Override
 	public List<Event> getEvents(boolean shortlist, boolean cvSent, boolean interview, boolean placement, boolean user, String userId) throws RemoteException {
 		return theServer.getEvents(shortlist, cvSent, interview, placement, user, userId);
+	}
+
+	@Override
+	public List<Task> getTasks(String userId) throws RemoteException {
+		return theServer.getTasks(userId);
 	}
 }

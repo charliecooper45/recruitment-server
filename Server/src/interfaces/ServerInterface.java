@@ -11,10 +11,10 @@ import database.beans.Candidate;
 import database.beans.CandidateSkill;
 import database.beans.Contact;
 import database.beans.Event;
-import database.beans.EventType;
 import database.beans.Organisation;
 import database.beans.Search;
 import database.beans.Skill;
+import database.beans.Task;
 import database.beans.User;
 import database.beans.Vacancy;
 
@@ -70,4 +70,5 @@ public interface ServerInterface extends Remote{
 	public boolean removeEvent(int eventId) throws RemoteException;
 	public boolean saveCandidateNotes(int candidateId, String notes) throws RemoteException;
 	public List<Event> getEvents(boolean shortlist, boolean cvSent, boolean interview, boolean placement, boolean user, String userId) throws RemoteException;
+	public List<Task> getTasks(String userId) throws RemoteException;
 }

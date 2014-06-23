@@ -1,5 +1,7 @@
 package database;
 
+import interfaces.ServerInterface;
+
 
 /**
  * Returns all DAO instances.
@@ -40,5 +42,9 @@ public final class DaoFactory {
 	
 	public static CandidateWorksAtDao getCandidateWorksAtDao() {
 		return new CandidateWorksAtDao();
+	}
+
+	public static TaskDao getTaskDao() {
+		return new TaskDao();
 	}
 }
