@@ -1,5 +1,7 @@
 package database;
 
+import interfaces.UserType;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,7 +11,6 @@ import java.util.List;
 
 import security.BCrypt;
 import database.beans.User;
-import interfaces.UserType;
 
 /**
  * Processes requests for the user table in the recruitment database.
@@ -85,12 +86,12 @@ public class UserDao {
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			if (status) {
 				// run this if only looking for active users
-				statement = conn.prepareStatement("SELECT user_id, first_name, surname FROM user WHERE account_type LIKE ? AND account_status LIKE ?");
+				statement = conn.prepareStatement("SELECT user_id, first_name, surname, email_address, phone_number, account_type, account_status FROM user WHERE account_type LIKE ? AND account_status = ?");
 				statement.setString(1, userTypeString);
 				statement.setBoolean(2, status);
 			} else {
 				// run this if looking for active and closed users
-				statement = conn.prepareStatement("SELECT user_id, first_name, surname FROM user WHERE account_type LIKE ?");
+				statement = conn.prepareStatement("SELECT user_id, first_name, surname, email_address, phone_number, account_type, account_status FROM user WHERE account_type LIKE ?");
 				statement.setString(1, userTypeString);
 			}
 
@@ -100,7 +101,11 @@ public class UserDao {
 				String userId = rs.getString("user_id");
 				String firstName = rs.getString("first_name");
 				String surname = rs.getString("surname");
-				User user = new User(userId, null, firstName, surname, null, null, false, null);
+				String emailAddress = rs.getString("email_address");
+				String phoneNumber = rs.getString("phone_number");
+				boolean accountStatus = rs.getBoolean("account_status");
+				UserType accountType = UserType.valueOf(rs.getString("account_type").toUpperCase());
+				User user = new User(userId, null, firstName, surname, emailAddress, phoneNumber, accountStatus, accountType);
 				users.add(user);
 			}
 		} catch (SQLException e) {

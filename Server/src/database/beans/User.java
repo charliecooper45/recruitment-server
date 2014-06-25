@@ -1,5 +1,7 @@
 package database.beans;
 
+import interfaces.UserType;
+
 import java.io.Serializable;
 
 /**
@@ -14,9 +16,9 @@ public class User implements Serializable, Comparable<User> {
 	private String emailAddress;
 	private String phoneNumber;
 	private boolean accountStatus;
-	private String accountType;
+	private UserType accountType;
 	
-	public User(String userId, String password, String firstName, String surname, String emailAddress, String phoneNumber, boolean accountStatus, String accountType) {
+	public User(String userId, String password, String firstName, String surname, String emailAddress, String phoneNumber, boolean accountStatus, UserType accountType) {
 		this.userId = userId;
 		this.password = password;
 		this.firstName = firstName;
@@ -31,6 +33,30 @@ public class User implements Serializable, Comparable<User> {
 		return userId;
 	}
 	
+	public String getFirstName() {
+		return firstName;
+	}
+	
+	public String getSurname() {
+		return surname;
+	}
+	
+	public String getEmailAddress() {
+		return emailAddress;
+	}
+	
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+	
+	public UserType getAccountType() {
+		return accountType;
+	}
+	
+	public boolean getAccountStatus() {
+		return accountStatus;
+	}
+	
 	@Override
 	public String toString() {
 		if(userId == null) {
@@ -38,7 +64,7 @@ public class User implements Serializable, Comparable<User> {
 		}
 		return userId + ": " + firstName + " " + surname;
 	}
-
+	
 	@Override
 	public int compareTo(User user) {
 		int compare = this.firstName.compareTo(user.firstName);
