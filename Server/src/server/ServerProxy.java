@@ -272,4 +272,14 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public List<Task> getTasks(String userId) throws RemoteException {
 		return theServer.getTasks(userId);
 	}
+
+	@Override
+	public boolean addTask(Task task) throws RemoteException {
+		return theServer.addTask(task);
+	}
+
+	@Override
+	public boolean removeTask(Task task) throws RemoteException {
+		return theServer.removeTask(task);
+	}
 }

@@ -97,6 +97,10 @@ public class CandidateDao {
 			statement.setString(9, candidate.getCV());
 			statement.setString(10, candidate.getUserId());
 			int value = statement.executeUpdate();
+			
+			if(value == 0) {
+				return false;
+			}
 
 			// add the organisation if the candidate has one
 			if (candidate.getOrganisationId() != -1) {
