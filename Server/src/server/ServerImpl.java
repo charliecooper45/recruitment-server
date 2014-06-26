@@ -275,4 +275,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public boolean removeTask(Task task) throws RemoteException {
 		return DaoFactory.getTaskDao().removeTask(task);
 	}
+
+	@Override
+	public boolean addUser(User user) throws RemoteException {
+		return DaoFactory.getUserDao().addUser(user);
+	}
 }

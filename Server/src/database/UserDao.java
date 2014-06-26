@@ -137,4 +137,32 @@ public class UserDao {
 		}
 		return null;
 	}
+
+	public boolean addUser(User user) {
+		PreparedStatement statement = null;
+		
+		try(Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("INSERT INTO user (user_id, password, first_name, surname, email_address, phone_number, account_status, account_type) VALUES " +
+					"(?, ?, ?, ?, ?,?, ?, ?)");
+			statement.setString(1, user.getUserId());
+			String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+			statement.setString(2, hashedPassword);
+			statement.setString(3, user.getFirstName());
+			statement.setString(4, user.getSurname());
+			statement.setString(5, user.getEmailAddress());
+			statement.setString(6, user.getPhoneNumber());
+			statement.setBoolean(7, user.getAccountStatus());
+			statement.setString(8, String.valueOf(user.getAccountType()).toLowerCase());
+			int result = statement.executeUpdate();
+			
+			if(result != 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+		return false;
+	}
 }
