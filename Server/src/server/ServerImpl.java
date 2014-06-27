@@ -280,4 +280,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public boolean addUser(User user) throws RemoteException {
 		return DaoFactory.getUserDao().addUser(user);
 	}
+
+	@Override
+	public boolean removeUser(User user) throws RemoteException {
+		return DaoFactory.getUserDao().removeUser(user);
+	}
 }
