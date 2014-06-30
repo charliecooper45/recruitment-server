@@ -292,4 +292,14 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public boolean removeUser(User user) throws RemoteException {
 		return theServer.removeUser(user);
 	}
+
+	@Override
+	public User getUser(String userId) throws RemoteException {
+		return theServer.getUser(userId);
+	}
+
+	@Override
+	public boolean updateUserDetails(User user) throws RemoteException {
+		return theServer.updateUserDetails(user);
+	}
 }

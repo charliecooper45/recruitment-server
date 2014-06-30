@@ -413,7 +413,6 @@ public class CandidateDao {
 	public boolean updateCandidateDetails(Candidate candidate) {
 		PreparedStatement statement = null;
 
-		// add the candidate
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("UPDATE candidate SET job_title = ?, phone_number = ?, email_address = ?, address = ? " + "WHERE candidate_id = ?");
 			statement.setString(1, candidate.getJobTitle());

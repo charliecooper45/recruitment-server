@@ -46,7 +46,6 @@ public class UserDao {
 	}
 
 	public String checkPassword(String userId, String password) {
-		//TODO NEXT: implement this
 		String databasePassword = null;
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
@@ -140,10 +139,9 @@ public class UserDao {
 
 	public boolean addUser(User user) {
 		PreparedStatement statement = null;
-		
-		try(Connection conn = DatabaseConnectionPool.getConnection()) {
-			statement = conn.prepareStatement("INSERT INTO user (user_id, password, first_name, surname, email_address, phone_number, account_status, account_type) VALUES " +
-					"(?, ?, ?, ?, ?,?, ?, ?)");
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("INSERT INTO user (user_id, password, first_name, surname, email_address, phone_number, account_status, account_type) VALUES " + "(?, ?, ?, ?, ?,?, ?, ?)");
 			statement.setString(1, user.getUserId());
 			String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
 			statement.setString(2, hashedPassword);
@@ -154,8 +152,8 @@ public class UserDao {
 			statement.setBoolean(7, user.getAccountStatus());
 			statement.setString(8, String.valueOf(user.getAccountType()).toLowerCase());
 			int result = statement.executeUpdate();
-			
-			if(result != 0) {
+
+			if (result != 0) {
 				return true;
 			}
 		} catch (SQLException e) {
@@ -168,14 +166,14 @@ public class UserDao {
 
 	public boolean removeUser(User user) {
 		PreparedStatement statement = null;
-		
-		try(Connection conn = DatabaseConnectionPool.getConnection()) {
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("DELETE FROM user WHERE user_id = ?");
 			statement.setString(1, user.getUserId());
-			
+
 			int result = statement.executeUpdate();
-			
-			if(result != 0) {
+
+			if (result != 0) {
 				return true;
 			}
 		} catch (SQLException e) {
@@ -183,6 +181,63 @@ public class UserDao {
 			e.printStackTrace();
 			return false;
 		}
+		return false;
+	}
+
+	public User getUser(String userId) {
+		User user = null;
+		PreparedStatement statement = null;
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("SELECT first_name, surname, email_address, phone_number, account_type, account_status FROM user WHERE user_id = ?");
+			statement.setString(1, userId);
+
+			ResultSet rs = statement.executeQuery();
+
+			while (rs.next()) {
+				String firstName = rs.getString("first_name");
+				String surname = rs.getString("surname");
+				String emailAddress = rs.getString("email_address");
+				String phoneNumber = rs.getString("phone_number");
+				boolean accountStatus = rs.getBoolean("account_status");
+				UserType accountType = UserType.valueOf(rs.getString("account_type").toUpperCase());
+				user = new User(userId, null, firstName, surname, emailAddress, phoneNumber, accountStatus, accountType);
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return null;
+		}
+		return user;
+	}
+
+	public boolean updateUserDetails(User user) {
+		PreparedStatement statement = null;
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("UPDATE user SET password = ?, first_name = ?, surname = ?, email_address = ?, phone_number = ?, account_status = ?, account_type = ?" + " WHERE user_id = ?");
+			if (!user.getPassword().trim().isEmpty()) {
+				String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+				statement.setString(1, hashedPassword);
+			}
+			statement.setString(2, user.getFirstName());
+			statement.setString(3, user.getSurname());
+			statement.setString(4, user.getEmailAddress());
+			statement.setString(5, user.getPhoneNumber());
+			statement.setBoolean(6, user.getAccountStatus());
+			statement.setString(7, String.valueOf(user.getAccountType()).toLowerCase());
+			statement.setString(8, user.getUserId());
+			int result = statement.executeUpdate();
+
+			if (result != 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+
 		return false;
 	}
 }
