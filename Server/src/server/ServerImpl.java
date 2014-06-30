@@ -295,4 +295,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public boolean updateUserDetails(User user) throws RemoteException {
 		return DaoFactory.getUserDao().updateUserDetails(user);
 	}
+
+	@Override
+	public boolean addSkill(Skill skill) throws RemoteException {
+		return DaoFactory.getSkillDao().addSkill(skill);
+	}
 }
