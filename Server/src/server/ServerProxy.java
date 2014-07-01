@@ -307,4 +307,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public boolean addSkill(Skill skill) throws RemoteException {
 		return theServer.addSkill(skill);
 	}
+
+	@Override
+	public boolean removeSkill(Skill skill) throws RemoteException {
+		return theServer.removeSkill(skill);
+	}
 }

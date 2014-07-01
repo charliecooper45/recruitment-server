@@ -1,5 +1,9 @@
 package database;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +11,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import server.ServerMain;
 
 import database.beans.Skill;
 
@@ -65,5 +71,27 @@ public class SkillDao {
 			return false;
 		}
 		return false;
+	}
+
+	public boolean removeSkill(Skill skill) {
+		PreparedStatement statement = null;
+		int returned = 0;
+
+		// remove the skill record
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("DELETE FROM skill WHERE skill_name = ?");
+			statement.setString(1, skill.getSkillName());
+			returned = statement.executeUpdate();
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return false;
+		}
+
+		if (returned != 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

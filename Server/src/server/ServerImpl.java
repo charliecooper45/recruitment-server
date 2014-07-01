@@ -300,4 +300,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public boolean addSkill(Skill skill) throws RemoteException {
 		return DaoFactory.getSkillDao().addSkill(skill);
 	}
+
+	@Override
+	public boolean removeSkill(Skill skill) throws RemoteException {
+		return DaoFactory.getSkillDao().removeSkill(skill);
+	}
 }
