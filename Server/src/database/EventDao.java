@@ -6,13 +6,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import database.beans.Candidate;
 import database.beans.Event;
 import database.beans.EventType;
+import database.beans.Report;
+import database.beans.User;
 import database.beans.Vacancy;
 
 /**
@@ -287,5 +291,81 @@ public class EventDao {
 			return null;
 		}
 		return events;
+	}
+
+	public Map<User, Map<EventType, Integer>> getUserReport(Report report) {
+		PreparedStatement statement = null;
+		Date fromDate = new Date(report.getFromDate().getTime());
+		Date toDate = new Date(report.getToDate().getTime());
+		
+		// setup the map
+		Map<User, Map<EventType, Integer>> results = new HashMap<>();
+		List<User> users = DaoFactory.getUserDao().getUsers(null, true);
+		for(User user: users) {
+			results.put(user, new HashMap<EventType, Integer>());
+		}
+		
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			for(User user: users) {
+				Map<EventType, Integer> userMap = results.get(user);
+				
+				int cvsSent = 0, shortlists = 0, phoneInterviews = 0, interview1s = 0, interview2s = 0, interview3s = 0, interview4s = 0, finalInterviews = 0, placements = 0;
+				statement = conn.prepareStatement("SELECT event_type_event_type_name, COUNT(event_type_event_type_name) AS occurences FROM event " +
+						"WHERE user_user_id = ? AND (event_date BETWEEN ? AND ?) " +
+						"GROUP BY event_type_event_type_name, event_date");
+				statement.setString(1, user.getUserId());
+				statement.setDate(2, fromDate);
+				statement.setDate(3, toDate);
+				
+				ResultSet rs = statement.executeQuery();
+				while(rs.next()) {
+					EventType eventType = EventType.valueOf(rs.getString("event_type_event_type_name"));
+					
+					if(eventType == EventType.CV_SENT) {
+						cvsSent = rs.getInt("occurences");
+					}
+					if(eventType == EventType.SHORTLIST) {
+						shortlists = rs.getInt("occurences");
+					}
+					if(eventType == EventType.PHONE_INTERVIEW) {
+						phoneInterviews = rs.getInt("occurences");
+					}
+					if(eventType == EventType.INTERVIEW_1) {
+						interview1s = rs.getInt("occurences");
+					}
+					if(eventType == EventType.INTERVIEW_2) {
+						interview2s = rs.getInt("occurences");
+					}
+					if(eventType == EventType.INTERVIEW_3) {
+						interview3s = rs.getInt("occurences");
+					}
+					if(eventType == EventType.INTERVIEW_4) {
+						interview4s = rs.getInt("occurences");
+					}
+					if(eventType == EventType.FINAL_INTERVIEW) {
+						finalInterviews = rs.getInt("occurences");
+					}
+					if(eventType == EventType.PLACEMENT) {
+						placements = rs.getInt("occurences");
+					}
+				}
+				
+				userMap.put(EventType.CV_SENT, cvsSent);
+				userMap.put(EventType.SHORTLIST, shortlists);
+				userMap.put(EventType.PHONE_INTERVIEW, phoneInterviews);
+				userMap.put(EventType.INTERVIEW_1, interview1s);
+				userMap.put(EventType.INTERVIEW_2, interview2s);
+				userMap.put(EventType.INTERVIEW_3, interview3s);
+				userMap.put(EventType.INTERVIEW_4, interview4s);
+				userMap.put(EventType.FINAL_INTERVIEW, finalInterviews);
+				userMap.put(EventType.PLACEMENT, placements);
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return null;
+		}
+		
+		return results;
 	}
 }

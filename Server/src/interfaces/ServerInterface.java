@@ -4,6 +4,7 @@ import java.net.URL;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Map;
 
 import com.healthmarketscience.rmiio.RemoteInputStream;
 
@@ -11,7 +12,9 @@ import database.beans.Candidate;
 import database.beans.CandidateSkill;
 import database.beans.Contact;
 import database.beans.Event;
+import database.beans.EventType;
 import database.beans.Organisation;
+import database.beans.Report;
 import database.beans.Search;
 import database.beans.Skill;
 import database.beans.Task;
@@ -79,4 +82,5 @@ public interface ServerInterface extends Remote{
 	public boolean updateUserDetails(User user) throws RemoteException;
 	public boolean addSkill(Skill skill) throws RemoteException;
 	public boolean removeSkill(Skill skill) throws RemoteException;
+	public Map<User, Map<EventType, Integer>> getUserReport(Report report) throws RemoteException;
 }

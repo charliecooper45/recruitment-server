@@ -7,6 +7,7 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Map;
 
 import com.healthmarketscience.rmiio.RemoteInputStream;
 
@@ -15,7 +16,9 @@ import database.beans.Candidate;
 import database.beans.CandidateSkill;
 import database.beans.Contact;
 import database.beans.Event;
+import database.beans.EventType;
 import database.beans.Organisation;
+import database.beans.Report;
 import database.beans.Search;
 import database.beans.Skill;
 import database.beans.Task;
@@ -304,5 +307,10 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	@Override
 	public boolean removeSkill(Skill skill) throws RemoteException {
 		return DaoFactory.getSkillDao().removeSkill(skill);
+	}
+
+	@Override
+	public Map<User, Map<EventType, Integer>> getUserReport(Report report) throws RemoteException {
+		return DaoFactory.getEventDao().getUserReport(report);
 	}
 }
