@@ -223,17 +223,14 @@ public class EventDao {
 		String userType = "%";
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
-			statement = conn.prepareStatement("SELECT first_name, surname, event_type_event_type_name, event_date, event.user_user_id, name, organisation_name, candidate_id " +
-					"FROM (event INNER JOIN candidate ON candidate_candidate_id = candidate_id) INNER JOIN " +
-					"(vacancy INNER JOIN organisation ON organisation_organisation_id = organisation_id) ON vacancy_vacancy_id = vacancy_id " +
-					"WHERE event.user_user_id LIKE ? AND vacancy_status = true");
-			if(user) {
+			statement = conn.prepareStatement("SELECT first_name, surname, event_type_event_type_name, event_date, event.user_user_id, name, organisation_name, candidate_id " + "FROM (event INNER JOIN candidate ON candidate_candidate_id = candidate_id) INNER JOIN " + "(vacancy INNER JOIN organisation ON organisation_organisation_id = organisation_id) ON vacancy_vacancy_id = vacancy_id " + "WHERE event.user_user_id LIKE ? AND vacancy_status = true");
+			if (user) {
 				userType = userId;
 			}
 			statement.setString(1, userType);
-			
+
 			ResultSet rs = statement.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				String firstName = rs.getString("first_name");
 				String surname = rs.getString("surname");
 				EventType eventType = EventType.valueOf(rs.getString("event_type_event_type_name"));
@@ -242,45 +239,45 @@ public class EventDao {
 				String vacancyName = rs.getString("name");
 				String organisationName = rs.getString("organisation_name");
 				int candidateId = rs.getInt("candidate_id");
-				
+
 				Candidate candidate = new Candidate(candidateId, firstName, surname, null, -1, null, null, null, null, null, null, null, null);
 				Vacancy vacancy = new Vacancy(-1, false, vacancyName, null, null, null, -1, organisationName, null, -1, null, null);
 				event = new Event(eventType, candidate, date, null, eventUserId, vacancy);
 				events.add(event);
 			}
-			
+
 			// remove any events that are not meant to be in the list
 			Iterator<Event> iterator = events.iterator();
-			while(iterator.hasNext()) {
+			while (iterator.hasNext()) {
 				Event currentEvent = iterator.next();
-				
-				if(!shortlist) {
-					if(currentEvent.getEventType() == EventType.SHORTLIST) {
-						iterator.remove();
-					}
-				} 
-				if(!cvSent) {
-					if(currentEvent.getEventType() == EventType.CV_SENT) {
-						iterator.remove();
-					}
-				} 
-				if(!interview) {
-					if(currentEvent.getEventType() == EventType.PHONE_INTERVIEW) {
-						iterator.remove();
-					} else if(currentEvent.getEventType() == EventType.INTERVIEW_1) {
-						iterator.remove();
-					} else if(currentEvent.getEventType() == EventType.INTERVIEW_2) {
-						iterator.remove();
-					} else if (currentEvent.getEventType() == EventType.INTERVIEW_3) {
-						iterator.remove();
-					} else if(currentEvent.getEventType() == EventType.INTERVIEW_4) {
-						iterator.remove();
-					} else if(currentEvent.getEventType() == EventType.FINAL_INTERVIEW) {
+
+				if (!shortlist) {
+					if (currentEvent.getEventType() == EventType.SHORTLIST) {
 						iterator.remove();
 					}
 				}
-				if(!placement) {
-					if(currentEvent.getEventType() == EventType.PLACEMENT) {
+				if (!cvSent) {
+					if (currentEvent.getEventType() == EventType.CV_SENT) {
+						iterator.remove();
+					}
+				}
+				if (!interview) {
+					if (currentEvent.getEventType() == EventType.PHONE_INTERVIEW) {
+						iterator.remove();
+					} else if (currentEvent.getEventType() == EventType.INTERVIEW_1) {
+						iterator.remove();
+					} else if (currentEvent.getEventType() == EventType.INTERVIEW_2) {
+						iterator.remove();
+					} else if (currentEvent.getEventType() == EventType.INTERVIEW_3) {
+						iterator.remove();
+					} else if (currentEvent.getEventType() == EventType.INTERVIEW_4) {
+						iterator.remove();
+					} else if (currentEvent.getEventType() == EventType.FINAL_INTERVIEW) {
+						iterator.remove();
+					}
+				}
+				if (!placement) {
+					if (currentEvent.getEventType() == EventType.PLACEMENT) {
 						iterator.remove();
 					}
 				}
@@ -297,25 +294,96 @@ public class EventDao {
 		PreparedStatement statement = null;
 		Date fromDate = new Date(report.getFromDate().getTime());
 		Date toDate = new Date(report.getToDate().getTime());
-		
+
 		// setup the map
 		Map<User, Map<EventType, Integer>> results = new HashMap<>();
 		List<User> users = DaoFactory.getUserDao().getUsers(null, true);
-		for(User user: users) {
+		for (User user : users) {
 			results.put(user, new HashMap<EventType, Integer>());
 		}
-		
+
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
-			for(User user: users) {
+			for (User user : users) {
 				Map<EventType, Integer> userMap = results.get(user);
-				
+
 				int cvsSent = 0, shortlists = 0, phoneInterviews = 0, interview1s = 0, interview2s = 0, interview3s = 0, interview4s = 0, finalInterviews = 0, placements = 0;
-				statement = conn.prepareStatement("SELECT event_type_event_type_name, COUNT(event_type_event_type_name) AS occurences FROM event " +
-						"WHERE user_user_id = ? AND (event_date BETWEEN ? AND ?) " +
-						"GROUP BY event_type_event_type_name, event_date");
+				statement = conn.prepareStatement("SELECT event_type_event_type_name, COUNT(event_type_event_type_name) AS occurences FROM event " + "WHERE user_user_id = ? AND (event_date BETWEEN ? AND ?) " + "GROUP BY event_type_event_type_name, event_date");
 				statement.setString(1, user.getUserId());
 				statement.setDate(2, fromDate);
 				statement.setDate(3, toDate);
+
+				ResultSet rs = statement.executeQuery();
+				while (rs.next()) {
+					EventType eventType = EventType.valueOf(rs.getString("event_type_event_type_name"));
+
+					if (eventType == EventType.CV_SENT) {
+						cvsSent = rs.getInt("occurences");
+					}
+					if (eventType == EventType.SHORTLIST) {
+						shortlists = rs.getInt("occurences");
+					}
+					if (eventType == EventType.PHONE_INTERVIEW) {
+						phoneInterviews = rs.getInt("occurences");
+					}
+					if (eventType == EventType.INTERVIEW_1) {
+						interview1s = rs.getInt("occurences");
+					}
+					if (eventType == EventType.INTERVIEW_2) {
+						interview2s = rs.getInt("occurences");
+					}
+					if (eventType == EventType.INTERVIEW_3) {
+						interview3s = rs.getInt("occurences");
+					}
+					if (eventType == EventType.INTERVIEW_4) {
+						interview4s = rs.getInt("occurences");
+					}
+					if (eventType == EventType.FINAL_INTERVIEW) {
+						finalInterviews = rs.getInt("occurences");
+					}
+					if (eventType == EventType.PLACEMENT) {
+						placements = rs.getInt("occurences");
+					}
+				}
+
+				userMap.put(EventType.CV_SENT, cvsSent);
+				userMap.put(EventType.SHORTLIST, shortlists);
+				userMap.put(EventType.PHONE_INTERVIEW, phoneInterviews);
+				userMap.put(EventType.INTERVIEW_1, interview1s);
+				userMap.put(EventType.INTERVIEW_2, interview2s);
+				userMap.put(EventType.INTERVIEW_3, interview3s);
+				userMap.put(EventType.INTERVIEW_4, interview4s);
+				userMap.put(EventType.FINAL_INTERVIEW, finalInterviews);
+				userMap.put(EventType.PLACEMENT, placements);
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return null;
+		}
+
+		return results;
+	}
+
+	public Map<Vacancy, Map<EventType, Integer>> getVacancyReport(Report report) {
+		PreparedStatement statement = null;
+		Date fromDate = new Date(report.getFromDate().getTime());
+		Date toDate = new Date(report.getToDate().getTime());
+
+		// setup the map
+		Map<Vacancy, Map<EventType, Integer>> results = new HashMap<>();
+		List<Vacancy> vacancies = DaoFactory.getVacancyDao().getVacancies(fromDate, toDate);
+		for (Vacancy vacancy : vacancies) {
+			results.put(vacancy, new HashMap<EventType, Integer>());
+		}
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			for (Vacancy vacancy : vacancies) {
+				Map<EventType, Integer> vacancyMap = results.get(vacancy);
+				int cvsSent = 0, shortlists = 0, phoneInterviews = 0, interview1s = 0, interview2s = 0, interview3s = 0, interview4s = 0, finalInterviews = 0, placements = 0;
+
+				statement = conn.prepareStatement("SELECT event_type_event_type_name, COUNT(event_type_event_type_name) AS occurences FROM event WHERE vacancy_vacancy_id = ? " +
+						"GROUP BY event_type_event_type_name");
+				statement.setInt(1, vacancy.getVacancyId());
 				
 				ResultSet rs = statement.executeQuery();
 				while(rs.next()) {
@@ -350,22 +418,22 @@ public class EventDao {
 					}
 				}
 				
-				userMap.put(EventType.CV_SENT, cvsSent);
-				userMap.put(EventType.SHORTLIST, shortlists);
-				userMap.put(EventType.PHONE_INTERVIEW, phoneInterviews);
-				userMap.put(EventType.INTERVIEW_1, interview1s);
-				userMap.put(EventType.INTERVIEW_2, interview2s);
-				userMap.put(EventType.INTERVIEW_3, interview3s);
-				userMap.put(EventType.INTERVIEW_4, interview4s);
-				userMap.put(EventType.FINAL_INTERVIEW, finalInterviews);
-				userMap.put(EventType.PLACEMENT, placements);
+				vacancyMap.put(EventType.CV_SENT, cvsSent);
+				vacancyMap.put(EventType.SHORTLIST, shortlists);
+				vacancyMap.put(EventType.PHONE_INTERVIEW, phoneInterviews);
+				vacancyMap.put(EventType.INTERVIEW_1, interview1s);
+				vacancyMap.put(EventType.INTERVIEW_2, interview2s);
+				vacancyMap.put(EventType.INTERVIEW_3, interview3s);
+				vacancyMap.put(EventType.INTERVIEW_4, interview4s);
+				vacancyMap.put(EventType.FINAL_INTERVIEW, finalInterviews);
+				vacancyMap.put(EventType.PLACEMENT, placements);
 			}
 		} catch (SQLException e) {
 			//TODO NEXT: Handle exceptions 
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		return results;
 	}
 }

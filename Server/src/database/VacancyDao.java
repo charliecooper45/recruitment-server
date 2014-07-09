@@ -82,7 +82,7 @@ public class VacancyDao {
 				if (conRs.next()) {
 					contactName = conRs.getString("first_name") + " " + conRs.getString("surname");
 					contactPhoneNumber = conRs.getString("phone_number");
-				} 
+				}
 
 				Vacancy vacancy = new Vacancy(vacancyId, vacancyStatus, name, date, text, profile, organisationId, organisationName, userId, contactId, contactName, contactPhoneNumber);
 				vacancies.add(vacancy);
@@ -134,7 +134,7 @@ public class VacancyDao {
 				if (conRs.next()) {
 					contactPhoneNumber = conRs.getString("phone_number");
 					contactName = conRs.getString("first_name") + " " + conRs.getString("surname");
-				} 
+				}
 
 				vacancy = new Vacancy(vacancyId, vacancyStatus, name, date, text, profile, organisationId, organisationName, userId, contactId, contactName, contactPhoneNumber);
 			}
@@ -283,9 +283,9 @@ public class VacancyDao {
 	public boolean removeVacancy(Vacancy vacancy) {
 		PreparedStatement statement = null;
 		int returned = 0;
-		
+
 		// remove the vacancy profile if it is present
-		if(vacancy.getProfile() != null) {
+		if (vacancy.getProfile() != null) {
 			try {
 				//delete the file
 				Path path = Paths.get(ServerMain.VACANCY_PROFILES_FOLDER + "/" + vacancy.getProfile());
@@ -306,7 +306,7 @@ public class VacancyDao {
 			e.printStackTrace();
 			return false;
 		}
-		if(returned != 0) {
+		if (returned != 0) {
 			return true;
 		} else {
 			return false;
@@ -321,7 +321,7 @@ public class VacancyDao {
 			statement = conn.prepareStatement("UPDATE vacancy SET vacancy_status = ?, vacancy_date = ?, contact_contact_id = ? WHERE vacancy_id = ?");
 			statement.setBoolean(1, vacancy.getStatus());
 			statement.setObject(2, vacancy.getVacancyDate());
-			if(vacancy.getContactId() != -1) {
+			if (vacancy.getContactId() != -1) {
 				statement.setInt(3, vacancy.getContactId());
 			} else {
 				statement.setObject(3, null);
@@ -342,7 +342,7 @@ public class VacancyDao {
 		PreparedStatement statement = null;
 		int vacancyId = -1;
 		String vacancyName = null;
-		
+
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("SELECT vacancy_id, name FROM vacancy WHERE organisation_organisation_id = ?");
 			statement.setInt(1, organisationId);
@@ -351,7 +351,7 @@ public class VacancyDao {
 			while (rs.next()) {
 				vacancyId = rs.getInt("vacancy_id");
 				vacancyName = rs.getString("name");
-				
+
 				Vacancy vacancy = new Vacancy(vacancyId, false, vacancyName, null, null, null, -1, null, null, -1, null, null);
 				vacancies.add(vacancy);
 			}
@@ -360,7 +360,53 @@ public class VacancyDao {
 			e.printStackTrace();
 			return null;
 		}
-		
+
+		return vacancies;
+	}
+
+	public List<Vacancy> getVacancies(java.sql.Date fromDate, java.sql.Date toDate) {
+		PreparedStatement statement = null;
+		List<Vacancy> vacancies = new ArrayList<>();
+		int vacancyId = -1, organisationId = -1, contactId = -1;
+		boolean vacancyStatus = false;
+		Date date = null;
+		String name = null, text = null, profile = null, userId = null, organisationName = null, contactName = null, contactPhoneNumber = null;
+
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			statement = conn.prepareStatement("SELECT vacancy_id, vacancy_status, name, vacancy_date, notes, profile, organisation_organisation_id, user_user_id, " 
+					+ "contact_contact_id FROM vacancy WHERE vacancy_date BETWEEN ? AND ?");
+			statement.setDate(1, fromDate);
+			statement.setDate(2, toDate);
+
+			ResultSet rs = statement.executeQuery();
+			while (rs.next()) {
+				vacancyId = rs.getInt("vacancy_id");
+				organisationId = rs.getInt("organisation_organisation_id");
+				contactId = rs.getInt("contact_contact_id");
+				vacancyStatus = rs.getBoolean("vacancy_status");
+				date = rs.getDate("vacancy_date");
+				name = rs.getString("name");
+				text = rs.getString("notes");
+				profile = rs.getString("profile");
+				userId = rs.getString("user_user_id");
+
+				PreparedStatement orgStatement = conn.prepareStatement("SELECT organisation_name FROM organisation WHERE organisation_id = ?");
+				orgStatement.setInt(1, organisationId);
+				ResultSet orgRs = orgStatement.executeQuery();
+				if (orgRs.next()) {
+					organisationName = orgRs.getString("organisation_name");
+				} else {
+					continue;
+				}
+
+				Vacancy vacancy = new Vacancy(vacancyId, vacancyStatus, name, date, text, profile, organisationId, organisationName, userId, contactId, contactName, contactPhoneNumber);
+				vacancies.add(vacancy);
+			}
+		} catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return null;
+		}
 		return vacancies;
 	}
 }
