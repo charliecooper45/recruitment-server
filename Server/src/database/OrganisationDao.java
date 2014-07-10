@@ -8,12 +8,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import server.ServerMain;
 
@@ -23,6 +26,7 @@ import com.healthmarketscience.rmiio.RemoteInputStreamServer;
 import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 
 import database.beans.Organisation;
+import database.beans.Report;
 
 /**
  * Processes requests for the organisation table in the recruitment database.
@@ -34,7 +38,7 @@ public class OrganisationDao {
 		int id = -1;
 
 		//TODO NEXT B: Not all of these variables are used below
-		String name, phoneNumber, emailAddress, website, address, termsOfBusiness, notes, linkedInProfile, userId;
+		String name, phoneNumber, address, userId;
 		int noOpenVacancies = 0;
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
@@ -69,8 +73,7 @@ public class OrganisationDao {
 	public Organisation getOrganisation(int organisationId) {
 		PreparedStatement statement;
 		Organisation organisation = null;
-		String name = null, phoneNumber = null, emailAddress = null, website = null, address = null, termsOfBusiness = null, notes = null, linkedInProfile = null, userId = null;
-		int id = -1;
+		String name = null, phoneNumber = null, emailAddress = null, website = null, address = null, termsOfBusiness = null, notes = null, userId = null;
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("SELECT organisation_id, organisation_name, phone_number, email_address, website, " + "address, terms_of_business, notes, user_user_id FROM organisation WHERE organisation_id = ?");
@@ -78,7 +81,6 @@ public class OrganisationDao {
 
 			ResultSet rs = statement.executeQuery();
 			if (rs.next()) {
-				id = rs.getInt("organisation_id");
 				name = rs.getString("organisation_name");
 				phoneNumber = rs.getString("phone_number");
 				emailAddress = rs.getString("email_address");
@@ -164,7 +166,7 @@ public class OrganisationDao {
 		// update the database
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("UPDATE organisation SET terms_of_business = null WHERE organisation_id = ?");
-			statement.setInt(1, organisation.getId());
+			statement.setInt(1, organisation.getOrganisationId());
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			//TODO NEXT: revert here
@@ -232,7 +234,7 @@ public class OrganisationDao {
 
 		try (Connection conn = DatabaseConnectionPool.getConnection()) {
 			statement = conn.prepareStatement("DELETE FROM organisation WHERE organisation_id = ?");
-			statement.setInt(1, organisation.getId());
+			statement.setInt(1, organisation.getOrganisationId());
 			returned = statement.executeUpdate();
 		} catch (SQLException e) {
 			//TODO NEXT: Handle exceptions 
@@ -256,8 +258,12 @@ public class OrganisationDao {
 			statement.setString(2, organisation.getEmailAddress());
 			statement.setString(3, organisation.getWebsite());
 			statement.setString(4, organisation.getAddress());
-			statement.setInt(5, organisation.getId());
+			statement.setInt(5, organisation.getOrganisationId());
 			int value = statement.executeUpdate();
+			
+			if(value == -1) {
+				return false;
+			}
 
 			return true;
 		} catch (SQLException e) {
@@ -265,5 +271,50 @@ public class OrganisationDao {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	public Map<Organisation, Map<Boolean, Integer>> getOrganisationReport(Report report) {
+		PreparedStatement statement = null;
+		Date fromDate = new Date(report.getFromDate().getTime());
+		Date toDate = new Date(report.getToDate().getTime());
+		
+		// setup the map
+		Map<Organisation, Map<Boolean, Integer>> results = new HashMap<>();
+		List<Organisation> organisations = DaoFactory.getOrganisationDao().getOrganisations();
+		for(Organisation organisation : organisations) {
+			results.put(organisation, new HashMap<Boolean, Integer>());
+		}
+		
+		try (Connection conn = DatabaseConnectionPool.getConnection()) {
+			for(Organisation organisation : organisations) {
+				Map<Boolean, Integer> organisationMap = results.get(organisation);
+				int openVacancies = 0, closedVacancies = 0;
+				
+				statement = conn.prepareStatement("SELECT vacancy_status, COUNT(*) as occurences FROM vacancy WHERE vacancy_date BETWEEN ? AND ? " +
+						"GROUP BY vacancy_status, organisation_organisation_id HAVING organisation_organisation_id = ?");
+				statement.setDate(1, fromDate);
+				statement.setDate(2, toDate);
+				statement.setInt(3, organisation.getOrganisationId());
+				
+				ResultSet rs = statement.executeQuery();
+				while(rs.next()) {
+					boolean status = rs.getBoolean("vacancy_status");
+					
+					if(status) {
+						openVacancies = rs.getInt("occurences");
+					} else {
+						closedVacancies = rs.getInt("occurences");
+					}
+				}
+				organisationMap.put(true, openVacancies);
+				organisationMap.put(false, closedVacancies);
+			}
+			
+		}  catch (SQLException e) {
+			//TODO NEXT: Handle exceptions 
+			e.printStackTrace();
+			return null;
+		}
+		return results;
 	}
 }

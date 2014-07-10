@@ -1,12 +1,12 @@
 package database;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,9 +29,8 @@ public class EventDao {
 		List<Event> shortlist = null;
 		PreparedStatement statement = null;
 		PreparedStatement candidateStatement = null;
-		int eventId, candidateId;
+		int candidateId;
 		Date eventDate;
-		int eventTime;
 		String userId, candidateFirstName, candidateSurname;
 		EventType eventType;
 
@@ -42,7 +41,6 @@ public class EventDao {
 			shortlist = new ArrayList<>();
 
 			while (rs.next()) {
-				eventId = rs.getInt("event_id");
 				candidateId = rs.getInt("candidate_candidate_id");
 				eventDate = rs.getDate("event_date");
 				userId = rs.getString("user_user_id");
@@ -307,7 +305,7 @@ public class EventDao {
 				Map<EventType, Integer> userMap = results.get(user);
 
 				int cvsSent = 0, shortlists = 0, phoneInterviews = 0, interview1s = 0, interview2s = 0, interview3s = 0, interview4s = 0, finalInterviews = 0, placements = 0;
-				statement = conn.prepareStatement("SELECT event_type_event_type_name, COUNT(event_type_event_type_name) AS occurences FROM event " + "WHERE user_user_id = ? AND (event_date BETWEEN ? AND ?) " + "GROUP BY event_type_event_type_name, event_date");
+				statement = conn.prepareStatement("SELECT event_type_event_type_name, COUNT(event_type_event_type_name) AS occurences FROM event WHERE user_user_id = ? AND (event_date BETWEEN ? AND ?) GROUP BY event_type_event_type_name, event_date");
 				statement.setString(1, user.getUserId());
 				statement.setDate(2, fromDate);
 				statement.setDate(3, toDate);

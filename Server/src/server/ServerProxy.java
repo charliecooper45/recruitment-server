@@ -325,4 +325,9 @@ public class ServerProxy extends UnicastRemoteObject implements ServerInterface 
 	public Map<Vacancy, Map<EventType, Integer>> getVacancyReport(Report report) throws RemoteException {
 		return theServer.getVacancyReport(report);
 	}
+
+	@Override
+	public Map<Organisation, Map<Boolean, Integer>> getOrganisationReport(Report report) throws RemoteException {
+		return theServer.getOrganisationReport(report);
+	}
 }

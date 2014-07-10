@@ -318,4 +318,9 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 	public Map<Vacancy, Map<EventType, Integer>> getVacancyReport(Report report) throws RemoteException {
 		return DaoFactory.getEventDao().getVacancyReport(report);
 	}
+
+	@Override
+	public Map<Organisation, Map<Boolean, Integer>> getOrganisationReport(Report report) throws RemoteException {
+		return DaoFactory.getOrganisationDao().getOrganisationReport(report);
+	}
 }

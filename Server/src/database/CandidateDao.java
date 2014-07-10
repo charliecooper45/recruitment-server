@@ -282,7 +282,7 @@ public class CandidateDao {
 			// check if the candidate works at an organisation and if they do add this information to the Candidate object
 			Organisation organisation = DaoFactory.getCandidateWorksAtDao().getCandididateOrganisation(id);
 			if (organisation != null) {
-				organisationId = organisation.getId();
+				organisationId = organisation.getOrganisationId();
 				organisationName = organisation.getOrganisationName();
 			}
 

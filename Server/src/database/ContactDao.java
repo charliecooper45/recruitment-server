@@ -25,7 +25,7 @@ public class ContactDao {
 		try(Connection conn = DatabaseConnectionPool.getConnection()) {
 			PreparedStatement statement = conn.prepareStatement("SELECT contact_id, first_name, surname, job_title, phone_number, email_address, address, " +
 					"notes, organisation_organisation_id, user_user_id FROM contact WHERE organisation_organisation_id = ?");
-			statement.setInt(1, organisation.getId());
+			statement.setInt(1, organisation.getOrganisationId());
 			ResultSet rs = statement.executeQuery();
 			
 			while (rs.next()) {
