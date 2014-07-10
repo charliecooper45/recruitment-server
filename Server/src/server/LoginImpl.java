@@ -10,6 +10,7 @@ import database.DaoFactory;
 import database.UserDao;
 
 public class LoginImpl extends UnicastRemoteObject implements LoginInterface {
+	private static final long serialVersionUID = 1L;
 	private ServerInterface theServer;
 	
 	public LoginImpl(ServerInterface theServer) throws RemoteException {

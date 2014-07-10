@@ -20,7 +20,7 @@ public class ContactDao {
 		List<Contact> contacts = new ArrayList<>();
 		int id = -1;
 		//TODO NEXT B: Not all of these variables are used below
-		String firstName, surname, jobTitle, phoneNumber, emailAddress, address, notes, organisationId, userId;
+		String firstName, surname, phoneNumber;
 		
 		try(Connection conn = DatabaseConnectionPool.getConnection()) {
 			PreparedStatement statement = conn.prepareStatement("SELECT contact_id, first_name, surname, job_title, phone_number, email_address, address, " +
@@ -61,6 +61,10 @@ public class ContactDao {
 			statement.setString(9, contact.getUserId());
 			
 			int value = statement.executeUpdate();
+			
+			if(value == 0) {
+				return false;
+			}
 		} catch (SQLException e) {
 			//TODO NEXT: revert here
 			e.printStackTrace();

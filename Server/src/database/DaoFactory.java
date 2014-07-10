@@ -1,8 +1,5 @@
 package database;
 
-import interfaces.ServerInterface;
-
-
 /**
  * Returns all DAO instances.
  * @author Charlie

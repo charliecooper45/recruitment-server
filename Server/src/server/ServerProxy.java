@@ -30,9 +30,13 @@ import database.beans.Vacancy;
  * @author Charlie
  */
 public class ServerProxy extends UnicastRemoteObject implements ServerInterface {
+	private static final long serialVersionUID = 1L;
 	private final ServerInterface theServer;
 	// The user associated with this proxy 
+	//TODO NEXT: implement security
+	@SuppressWarnings("unused")
 	private String userId;
+	@SuppressWarnings("unused")
 	private String userType;
 
 	public ServerProxy(String userId, String userType, ServerInterface theServer) throws RemoteException, SecurityException {

@@ -328,6 +328,10 @@ public class VacancyDao {
 			}
 			statement.setInt(4, vacancy.getVacancyId());
 			int value = statement.executeUpdate();
+			
+			if(value == 0) {
+				return false;
+			}
 
 			return true;
 		} catch (SQLException e) {

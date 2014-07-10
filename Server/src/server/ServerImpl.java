@@ -30,6 +30,8 @@ import database.beans.Vacancy;
  * @author Charlie
  */
 public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
+	private static final long serialVersionUID = 1L;
+
 	protected ServerImpl() throws RemoteException {
 		super();
 	}

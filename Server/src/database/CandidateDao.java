@@ -421,6 +421,10 @@ public class CandidateDao {
 			statement.setString(4, candidate.getAddress());
 			statement.setInt(5, candidate.getId());
 			int value = statement.executeUpdate();
+			
+			if(value == 0) {
+				return false;
+			}
 
 			// delete any existing record then insert the new record to show where the candidate works
 			DaoFactory.getCandidateWorksAtDao().removeEmployment(candidate.getId());
