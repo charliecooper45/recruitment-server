@@ -25,7 +25,7 @@ public class DatabaseConnectionPool {
 		p.put("com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL", "OFF"); 
 		System.setProperties(p);
 		
-		URL = "jdbc:mysql://localhost:3306/recruitment_test_database";
+		URL = "jdbc:mysql://localhost:3306/recruitment_database";
 		USERNAME = "root";
 		PASSWORD = "letmein";
 
